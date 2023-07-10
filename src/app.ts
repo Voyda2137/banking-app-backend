@@ -12,7 +12,7 @@ app.use(cors());
 app.get('/', (req: Request, res: Response) => {
     res.send('Express + TypeScript Server');
 });
-app.post('/xd', async (req, res) => {
+app.post('/xd', async (req: Request, res: Response) => {
     try {
         const alcohol = {
             name: req.body.name
