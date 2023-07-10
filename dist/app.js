@@ -39,7 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bodyParser = __importStar(require("body-parser"));
 const app = (0, express_1.default)();
-const port = 2137;
+const port = process.env.PORT;
 const cors = require('cors');
 app.use(bodyParser.json());
 app.use(cors());
