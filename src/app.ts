@@ -1,6 +1,6 @@
 // @ts-ignore
 import express, { Express, Request, Response } from 'express';
-import bodyParser from "body-parser";
+const bodyParser = require('body-parser')
 const app: Express = express()
 const port = process.env.PORT
 const cors = require('cors')
