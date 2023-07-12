@@ -16,7 +16,10 @@ app.use(passport_1.default.initialize());
 app.use(cors());
 // user
 app.use('/user', UserRouter_1.default);
+app.get('/protected', passport_1.default.authenticate('jwt', { session: false }), (req, res) => {
+    res.json({ message: 'Protected route' });
+});
 (0, DatabaseUtils_1.connectToMongo)();
 app.listen(port, () => {
-console.log('xdd')
+    console.log(`xdd`);
 });
