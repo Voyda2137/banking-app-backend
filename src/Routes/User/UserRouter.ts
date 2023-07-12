@@ -5,6 +5,7 @@ import {createUser} from "../../DatabaseUtils/DatabaseUtils";
 const userRouter = Router()
 
 userRouter.post('/login', (req: Request, res: Response) => {
+    console.log('bodddddddy', req.body)
     const {login, password} = req.body
     res.send(authenticateUser(login, password))
 })
