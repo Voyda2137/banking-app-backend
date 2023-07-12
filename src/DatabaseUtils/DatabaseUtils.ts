@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import {UserModel, User} from "../models/UserInterface";
-import bcrypt from "bcrypt";
+const bcrypt = require('bcrypt')
 
 dotenv.config()
 

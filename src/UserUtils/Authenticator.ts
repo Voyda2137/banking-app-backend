@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
 import { User, UserModel } from "../models/UserInterface";
 import { generateToken } from "./JWTgenerator";
 import { Document } from 'mongoose';
+const bcrypt = require('bcrypt')
+
 
 interface AuthenticatedUser extends User {
     token: string;
