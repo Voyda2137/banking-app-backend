@@ -5,7 +5,8 @@
     "outDir": "dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true
+    "strict": true,
+    "types": []
   },
   "include": ["src/**/*", "src"],
   "exclude": ["node_modules", "dist"]
