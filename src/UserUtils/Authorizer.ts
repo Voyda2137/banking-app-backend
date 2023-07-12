@@ -6,7 +6,7 @@ import {UserModel} from "../models/UserInterface";
 dotenv.config()
 
 const jwtOptions = {
-    authorizerSecretKey: process.env.AUTHORIZER_SECRET,
+    secretOrKey: process.env.AUTHORIZER_SECRET,
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
 }
 passport.use(new Strategy(jwtOptions, async (payload, done) => {
