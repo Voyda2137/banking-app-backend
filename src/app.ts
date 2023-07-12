@@ -1,8 +1,8 @@
 // @ts-ignore
 import express, { Express, Request, Response } from 'express';
-import passport from "passport";
 import {connectToMongo} from "./DatabaseUtils/DatabaseUtils";
 import userRouter from "./Routes/User/UserRouter";
+import passport from "./UserUtils/Authorizer";
 
 const app: Express = express()
 const port = process.env.PORT

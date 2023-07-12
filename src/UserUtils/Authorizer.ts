@@ -23,3 +23,4 @@ passport.use(new Strategy(jwtOptions, async (payload, done) => {
         return done(Error, false)
     }
 }))
+export default passport;
