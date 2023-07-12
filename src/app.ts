@@ -15,8 +15,7 @@ app.use(passport.initialize())
 app.use(cors());
 
 // user
-app.use('/login', userRouter)
-app.use('/register', userRouter)
+app.use('/user', userRouter)
 
 connectToMongo()
 
