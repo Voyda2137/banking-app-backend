@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc --declaration && node -r tsconfig-paths/register ./dist/app.js",
-    "start": "ts-node src/app.ts",
+    "build": "npx tsc --declaration",
+    "start": "node -r tsconfig-paths/register ./dist/app.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q app.ts\"",
     "heroku-postbuild": "npm run build"
   },
