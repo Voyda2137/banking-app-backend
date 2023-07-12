@@ -6,7 +6,8 @@
   "scripts": {
     "build": "npx tsc --declaration && node -r tsconfig-paths/register ./dist/app.js",
     "start": "ts-node src/app.ts",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q app.ts\""
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q app.ts\"",
+    "heroku-postbuild": "npm run build"
   },
   "repository": {
     "type": "git",
