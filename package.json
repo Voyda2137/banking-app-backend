@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc",
+    "build": "npx tsc --declaration",
     "start": "ts-node src/app.ts",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q app.ts\""
   },
@@ -44,6 +44,7 @@
     "@types/passport-jwt": "^3.0.9",
     "concurrently": "^8.2.0",
     "nodemon": "^2.0.22",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.6"
   }
 }
