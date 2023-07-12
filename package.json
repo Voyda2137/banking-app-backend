@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "^16.15.0"
+  },
   "name": "banking-app-backend",
   "version": "1.0.0",
   "description": "",
