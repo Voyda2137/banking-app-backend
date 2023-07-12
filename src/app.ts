@@ -1,29 +1,25 @@
 // @ts-ignore
 import express, { Express, Request, Response } from 'express';
+import passport from "passport";
+import {connectToMongo} from "./DatabaseUtils/DatabaseUtils";
+import userRouter from "./Routes/User/UserRouter";
+
 const bodyParser = require('body-parser')
+
 const app: Express = express()
 const port = process.env.PORT
 const cors = require('cors')
 
 app.use(bodyParser.json())
-
+app.use(passport.initialize())
 app.use(cors());
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Express + TypeScript Server');
-});
-app.post('/xd', async (req: Request, res: Response) => {
-    try {
-        const alcohol = {
-            name: req.body.name
-        }
-        console.log('alcohol', alcohol)
-        res.sendStatus(200)
-    }
-    catch (e) {
-        res.status(500).send('Could not add alcohol')
-    }
-})
+// user
+app.use('/login', userRouter)
+app.use('/register', userRouter)
+
+connectToMongo()
+
 app.listen(port, () => {
     console.log(`xdd`);
 });
