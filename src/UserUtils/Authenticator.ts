@@ -8,21 +8,25 @@ const bcrypt = require('bcrypt')
 interface AuthenticatedUser extends User {
     token: string;
 }
-export const authenticateUser = async (req: Request, res: Response): Promise<void> => {
-    const { login, password } = req.body;
+
+/**
+ *
+ * @param login
+ * @param password
+ * @returns code: 1 - user not found, 2 - invalid password, 3 - success
+ */
+export const authenticateUser = async ({login, password}: { login: string, password: string }) => {
 
     const user = await UserModel.findOne({ login });
 
     if (!user) {
-        res.status(401).json({ success: false, message: 'User not found' });
-        return;
+        return {code: 1};
     }
 
     const validatePassword = await bcrypt.compare(password, user.password);
 
     if (!validatePassword) {
-        res.status(401).json({ success: false, message: 'Invalid password' });
-        return;
+        return {code: 2};
     }
 
     const token = generateToken(user);
@@ -31,6 +35,5 @@ export const authenticateUser = async (req: Request, res: Response): Promise<voi
         ...user.toObject(),
         token,
     } as AuthenticatedUser & Document<any>;
-
-    res.status(200).json({ success: true, token: authenticatedUser.token });
+    return {code: 3, token: authenticatedUser.token}
 };
