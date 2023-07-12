@@ -9,7 +9,6 @@ interface AuthenticatedUser extends User {
     token: string;
 }
 export const authenticateUser = async (req: Request, res: Response): Promise<void> => {
-    console.log('bodddddddy', req.body)
     const { login, password } = req.body;
 
     const user = await UserModel.findOne({ login });

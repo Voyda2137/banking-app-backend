@@ -5,8 +5,7 @@ import {createUser} from "../../DatabaseUtils/DatabaseUtils";
 const userRouter = Router()
 
 userRouter.post('/login', (req: Request, res: Response) => {
-    const {login, password} = req.body
-    res.send(authenticateUser(login, password))
+    res.send(authenticateUser(req.body, res))
 })
 userRouter.post('/register', (req: Request, res: Response) => {
     createUser(req.body).then(val=> {
