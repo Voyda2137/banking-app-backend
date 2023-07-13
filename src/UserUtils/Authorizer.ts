@@ -11,16 +11,15 @@ const jwtOptions = {
 }
 passport.use(new Strategy(jwtOptions, async (payload, done) => {
     try {
-        const user = await UserModel.findById(payload.login)
-        if(user){
-            return done(null, user)
+        const user = await UserModel.findById(payload.sub);
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false);
         }
-        else {
-            return done(null, false)
-        }
+    } catch (e) {
+        console.error(e);
+        return done(e, false);
     }
-    catch (e){
-        return done(Error, false)
-    }
-}))
+}));
 export default passport;
