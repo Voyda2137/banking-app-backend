@@ -11,7 +11,7 @@ const jwtOptions = {
 }
 passport.use(new Strategy(jwtOptions, async (payload, done) => {
     try {
-        const user = await UserModel.findById(payload.login);
+        const user = await UserModel.findById({login: payload.login});
         if (user) {
             return done(null, user);
         } else {

@@ -14,7 +14,7 @@ app.use(cors());
 
 // user
 app.use('/user', userRouter)
-app.get('/protected', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.get('/protected', passport.authenticate('jwt', { session: false }), (req: Request, res: Response) => {
     res.json({ message: 'Protected route' });
 });
 connectToMongo()
