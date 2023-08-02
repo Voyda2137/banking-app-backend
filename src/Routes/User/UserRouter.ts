@@ -1,6 +1,8 @@
 import {Router, Request, Response} from "express";
 import {authenticateUser} from "../../UserUtils/Authenticator";
-import {createUser} from "../../DatabaseUtils/DatabaseUtils";
+import {createUser, getUserByLogin} from "../../DatabaseUtils/DatabaseUtils";
+import passport from "../../UserUtils/Authorizer";
+import {User} from "../../models/UserInterface";
 
 const userRouter = Router()
 
@@ -28,5 +30,18 @@ userRouter.post('/register', (req: Request, res: Response) => {
         }
     })
 })
+userRouter.get('/user', passport.authenticate('jwt', { session: false }), (req: Request, res: Response) => {
+    getUserByLogin(req.body).then((response: User | null) => {
+        if (response === null) {
+            res.status(500).json({ success: false, message: 'Could not get user details' });
+        } else {
+            res.status(200).json({
+                message: 'Successfully retrieved the user details',
+                response,
+                success: true,
+            });
+        }
+    });
+});
 
 export default userRouter

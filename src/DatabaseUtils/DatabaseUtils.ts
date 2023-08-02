@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import {UserModel, User} from "../models/UserInterface";
+import {BankAccount, BankAccountModel} from "../models/AccountInterface";
 const bcrypt = require('bcrypt')
 
 dotenv.config()
@@ -30,8 +31,59 @@ export const createUser = async (userData: User): Promise<User | null> => {
 
         return await newUser.save();
 
-    } catch (error) {
-        console.error('Error creating user:', error);
+    } catch (e) {
         return null;
     }
 };
+export const getUserByLogin = async (login: string): Promise<User | null> => {
+    try {
+        const user = await UserModel.findOne({ login });
+        if (user) {
+            return user.toObject()
+        } else {
+            return null;
+        }
+    } catch (e) {
+        return null;
+    }
+};
+
+export const createBankAccount = async (accountData: BankAccount) : Promise<BankAccount | null> => {
+    try {
+        const {
+            accountNumber,
+            balance,
+            currency,
+            type,
+            status,
+            createdAt,
+            updatedAt
+        } = accountData
+        const newBankAccount = new BankAccountModel(accountData)
+
+        return await newBankAccount.save()
+    }
+    catch (e){
+        return null
+    }
+}
+export const getUserAccounts = async (userId: string): Promise<BankAccount[] | null> => {
+    try{
+        const user = await UserModel.findOne({userId})
+        const accounts: BankAccount[] = []
+        if(user){
+            if(user.bankAccounts.length > 0){
+                for (const acc of user.bankAccounts) {
+                    const account = await BankAccountModel.findOne({ acc });
+                    if (account !== null) {
+                        accounts.push(account);
+                    }
+                }
+            }
+        }
+        return accounts
+    }
+    catch (e) {
+        return null
+    }
+}
