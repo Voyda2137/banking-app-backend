@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import {UserModel, User} from "../models/UserInterface";
 import {BankAccount, BankAccountModel} from "../models/AccountInterface";
+import {generateBankAccountNumber} from "../AccountUtils/AccountUtils";
+import moment from "moment"
 const bcrypt = require('bcrypt')
 
 dotenv.config()
@@ -50,16 +52,16 @@ export const getUserByLogin = async (login: string): Promise<User | null> => {
 
 export const createBankAccount = async (accountData: BankAccount) : Promise<BankAccount | null> => {
     try {
-        const {
-            accountNumber,
-            balance,
-            currency,
-            type,
-            status,
-            createdAt,
-            updatedAt
-        } = accountData
-        const newBankAccount = new BankAccountModel(accountData)
+        const account = {
+            accountNumber: generateBankAccountNumber(),
+            balance: 0,
+            currency: accountData.currency,
+            type: accountData.type,
+            accountStatus: accountData.accountStatus,
+            createdAt: moment().valueOf(),
+            updatedAt: moment().valueOf()
+        }
+        const newBankAccount = new BankAccountModel(account)
 
         return await newBankAccount.save()
     }

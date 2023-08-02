@@ -5,9 +5,9 @@ export interface BankAccount extends Document {
     balance: number;
     currency: string;
     type: string;
-    status: string;
-    createdAt: Date;
-    updatedAt: Date;
+    accountStatus: string;
+    createdAt: number;
+    updatedAt: number;
 }
 
 const bankAccountSchema = new Schema<BankAccount>({
@@ -15,9 +15,9 @@ const bankAccountSchema = new Schema<BankAccount>({
     balance: { type: Number, required: true },
     currency: { type: String, required: true },
     type: { type: String, required: true },
-    status: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now, required: true },
-    updatedAt: { type: Date, default: Date.now, required: true },
+    accountStatus: { type: String, required: true },
+    createdAt: { type: Number, required: true },
+    updatedAt: { type: Number, required: true },
 });
 
 export const BankAccountModel = mongoose.model<BankAccount>(
