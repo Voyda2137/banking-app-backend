@@ -93,7 +93,7 @@ export const getUserAccounts = async (userId: string): Promise<BankAccount[] | n
 export const addAccountToUser = async (userId: string, bankAccId: string) => {
     try {
         console.log('userId:',userId, 'bankId', bankAccId)
-        return await UserModel.updateOne({userId}, {$push: {bankAccounts: bankAccId}})
+        return await UserModel.updateOne({_id: userId}, {$push: {bankAccounts: bankAccId}})
     }
     catch(e){
         return null
