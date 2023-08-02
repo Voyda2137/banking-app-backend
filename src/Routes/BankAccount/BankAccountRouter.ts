@@ -1,5 +1,5 @@
 import {Router, Request, Response} from "express";
-import {createBankAccount, getUserAccounts} from "../../DatabaseUtils/DatabaseUtils";
+import {addAccountToUser, createBankAccount, getUserAccounts} from "../../DatabaseUtils/DatabaseUtils";
 import passport from "../../UserUtils/Authorizer"
 
 const bankAccountRouter = Router()
@@ -10,7 +10,9 @@ bankAccountRouter.post('/create', passport.authenticate('jwt', { session: false 
             res.status(500).json({ success: false, message: 'Account creation failure' })
         }
         else{
-            res.status(200).json({success: true, message: 'Successfully created the bank account'})
+            addAccountToUser(req.body.userId, response._id.toString()).then(() => {
+                res.status(200).json({success: true, message: 'Successfully created the bank account'})
+            })
         }
     })
 })
@@ -21,6 +23,7 @@ bankAccountRouter.get('/accounts', passport.authenticate('jwt', { session: false
         }
         else{
             res.status(200).json({success: true, message: 'Successfully retrieved user accounts', accounts: response})
+
         }
     })
 })

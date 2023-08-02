@@ -62,7 +62,6 @@ export const createBankAccount = async (accountData: BankAccount) : Promise<Bank
             updatedAt: moment().valueOf()
         }
         const newBankAccount = new BankAccountModel(account)
-
         return await newBankAccount.save()
     }
     catch (e){
@@ -87,6 +86,14 @@ export const getUserAccounts = async (userId: string): Promise<BankAccount[] | n
         return accounts
     }
     catch (e) {
+        return null
+    }
+}
+export const addAccountToUser = async (userId: string, bankAccId: string) => {
+    try {
+        return await UserModel.updateOne({userId}, {$push: {bankAccounts: bankAccId}})
+    }
+    catch(e){
         return null
     }
 }
