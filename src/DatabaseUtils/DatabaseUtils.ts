@@ -66,6 +66,7 @@ export const createBankAccount = async (accountData: BankAccount) : Promise<Bank
         return await newBankAccount.save()
     }
     catch (e){
+        console.log(e)
         return null
     }
 }
