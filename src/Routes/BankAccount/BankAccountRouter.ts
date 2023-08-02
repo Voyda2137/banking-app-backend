@@ -24,3 +24,4 @@ bankAccountRouter.get('/accounts', passport.authenticate('jwt', { session: false
         }
     })
 })
+export default bankAccountRouter
