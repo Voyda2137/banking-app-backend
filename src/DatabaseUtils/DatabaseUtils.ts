@@ -34,6 +34,7 @@ export const createUser = async (userData: User): Promise<User | null> => {
         return await newUser.save();
 
     } catch (e) {
+        console.log(e)
         return null;
     }
 };
