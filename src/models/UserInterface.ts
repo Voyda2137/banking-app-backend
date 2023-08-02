@@ -21,7 +21,7 @@ const userSchema = new Schema<User>({
     phoneNumber: { type: Number, required: true },
     login: { type: String, required: true },
     password: { type: String, required: true },
-    bankAccounts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BankAccount' }],
+    bankAccounts: [{ type: mongoose.Schema.Types.ObjectId, default: [], ref: 'BankAccount' }],
 });
 
 export const UserModel = mongoose.model<User>("users", userSchema);
