@@ -8,12 +8,12 @@ import {authenticateUserCodes} from "../../Constants/ResponseCodes";
 
 const userRouter = Router()
 
-userRouter.post('/login', (req: Request, res: Response) => {
+userRouter.post('/login', async (req: Request, res: Response) => {
     const expectedProperties = ['login', 'password']
-    const validateRequest = validateRequestProperties(req.body, expectedProperties)
-    if(validateRequest.success){
+    const validateRequest = await validateRequestProperties(req.body, expectedProperties)
+    if (validateRequest.success) {
         authenticateUser(req.body).then(response => {
-            switch(response.code){
+            switch (response.code) {
                 case authenticateUserCodes.USER_NOT_FOUND: {
                     return res.status(401).json({success: false, message: 'User not found'});
                 }
@@ -21,13 +21,13 @@ userRouter.post('/login', (req: Request, res: Response) => {
                     return res.status(401).json({success: false, message: 'Invalid password'});
                 }
                 case authenticateUserCodes.SUCCESS: {
-                    return res.status(200).json({ success: true, token: response.token });
+                    return res.status(200).json({success: true, token: response.token});
                 }
-                default: break
+                default:
+                    break
             }
         })
-    }
-    else{
+    } else {
         return res.status(500).json(validateRequest)
     }
 })
