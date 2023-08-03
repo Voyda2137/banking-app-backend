@@ -3,22 +3,32 @@ import {authenticateUser} from "../../UserUtils/Authenticator";
 import {createUser, getUserByLogin} from "../../DatabaseUtils/DatabaseUtils";
 import passport from "../../UserUtils/Authorizer";
 import {User} from "../../models/UserInterface";
+import {validateRequestProperties} from "../../Validators/Validators";
 
 const userRouter = Router()
 
 userRouter.post('/login', (req: Request, res: Response) => {
-    authenticateUser(req.body).then(response => {
-        if(response.code === 1){
-            return res.status(401).json({ success: false, message: 'User not found' });
-        }
-        else if(response.code === 2){
-            return res.status(401).json({ success: false, message: 'Invalid password' });
-        }
-        else if(response.code === 3){
-            return res.status(200).json({ success: true, token: response.token });
-
-        }
-    })
+    const expectedProperties = ['login', 'password']
+    const validateRequest = validateRequestProperties(req.body, expectedProperties)
+    if(validateRequest.success){
+        authenticateUser(req.body).then(response => {
+            switch(response.code){
+                case authenticateUserCodes.USER_NOT_FOUND: {
+                    return res.status(401).json({success: false, message: 'User not found'});
+                }
+                case authenticateUserCodes.INVALID_PASSWORD: {
+                    return res.status(401).json({success: false, message: 'Invalid password'});
+                }
+                case authenticateUserCodes.SUCCESS: {
+                    return res.status(200).json({ success: true, token: response.token });
+                }
+                default: break
+            }
+        })
+    }
+    else{
+        return res.status(500).json(validateRequest)
+    }
 })
 userRouter.post('/register', (req: Request, res: Response) => {
     createUser(req.body).then(val=> {
