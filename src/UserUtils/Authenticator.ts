@@ -14,25 +14,31 @@ interface AuthenticatedUser extends User {
  * @param password
  * @returns code: 1 - user not found, 2 - invalid password, 3 - success
  */
-export const authenticateUser = async ({login, password}: { login: string, password: string }) => {
+export const authenticateUser = async ({ login, password }: { login: string, password: string }): Promise<AuthenticatedUser | null> => {
+    try {
+        const user = await UserModel.findOne({ login });
 
-    const user = await UserModel.findOne({ login });
+        if (!user) {
+            return null;
+        }
 
-    if (!user) {
-        return {code: 1};
+        const validatePassword = await bcrypt.compare(password, user.password);
+
+        if (!validatePassword) {
+            return null;
+        }
+
+        const token = generateToken(user);
+
+        const authenticatedUser: AuthenticatedUser & Document<any> = {
+            ...user.toObject(),
+            token,
+        } as AuthenticatedUser & Document<any>;
+
+        return authenticatedUser;
+    } catch (error) {
+        console.error("Error in authenticateUser:", error);
+        return null;
     }
-
-    const validatePassword = await bcrypt.compare(password, user.password);
-
-    if (!validatePassword) {
-        return {code: 2};
-    }
-
-    const token = generateToken(user);
-
-    const authenticatedUser: AuthenticatedUser & Document<any> = {
-        ...user.toObject(),
-        token,
-    } as AuthenticatedUser & Document<any>;
-    return {code: 3, token: authenticatedUser.token}
 };
+

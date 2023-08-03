@@ -4,33 +4,26 @@ import {createUser, getUserByLogin} from "../../DatabaseUtils/DatabaseUtils";
 import passport from "../../UserUtils/Authorizer";
 import {User} from "../../models/UserInterface";
 import {validateRequestProperties} from "../../Validators/Validators";
-import {authenticateUserCodes} from "../../Constants/ResponseCodes";
 
 const userRouter = Router()
 
 userRouter.post('/login', async (req: Request, res: Response) => {
     const expectedProperties = ['login', 'password']
-    const validateRequest = await validateRequestProperties(req.body, expectedProperties)
-    if (validateRequest.success) {
-        authenticateUser(req.body).then(response => {
-            switch (response.code) {
-                case authenticateUserCodes.USER_NOT_FOUND: {
-                    return res.status(401).json({success: false, message: 'User not found'});
-                }
-                case authenticateUserCodes.INVALID_PASSWORD: {
-                    return res.status(401).json({success: false, message: 'Invalid password'});
-                }
-                case authenticateUserCodes.SUCCESS: {
-                    return res.status(200).json({success: true, token: response.token});
-                }
-                default:
-                    break
-            }
-        })
-    } else {
-        return res.status(500).json(validateRequest)
+    const validateRequest = await validateRequestProperties(req.body, expectedProperties);
+
+    if (!validateRequest.success) {
+        return res.status(500).json(validateRequest);
     }
-})
+
+    const response = await authenticateUser(req.body);
+
+    if (response === null) {
+        return res.status(401).json({ success: false, message: 'User not found or invalid password' });
+    }
+
+    return res.status(200).json({ success: true, token: response.token });
+});
+
 userRouter.post('/register', (req: Request, res: Response) => {
     createUser(req.body).then(val=> {
         if(val === null){
