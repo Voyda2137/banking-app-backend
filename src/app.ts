@@ -16,9 +16,6 @@ app.use(cors());
 // user
 app.use('/user', userRouter)
 app.use('/accounts', BankAccountRouter)
-app.get('/protected', passport.authenticate('jwt', { session: false }), (req: Request, res: Response) => {
-    res.json({ message: 'Protected route' });
-});
 connectToMongo()
 
 app.listen(port, () => {

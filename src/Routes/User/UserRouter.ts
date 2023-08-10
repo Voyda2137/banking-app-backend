@@ -4,6 +4,7 @@ import {createUser, getUserByLogin} from "../../DatabaseUtils/DatabaseUtils";
 import passport from "../../UserUtils/Authorizer";
 import {User} from "../../models/UserInterface";
 import {validateRequestProperties} from "../../Validators/Validators";
+import cookie from 'cookie'
 
 const userRouter = Router()
 
@@ -24,24 +25,46 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     return res.status(200).json({ success: true, token: response.token });
 });
 
-userRouter.post('/register', (req: Request, res: Response) => {
+userRouter.post('/register', async (req: Request, res: Response) => {
+    const expectedProperties = ['name', 'surname', 'email', 'address', 'phoneNumber', 'login', 'password']
+    const validateRequest = await validateRequestProperties(req.body, expectedProperties)
+
+    if(!validateRequest.success){
+        return res.status(500).json(validateRequest)
+    }
+
     createUser(req.body).then(val=> {
         if(val === null){
-            res.status(409).json({success: false, message: 'User with given login or email already exists'})
+            return res.status(409).json({success: false, message: 'User with given login or email already exists'})
         }
         else {
-            res.status(200).json({ success: true, message: 'Successfully created user' })
+            return res.status(200).json({ success: true, message: 'Successfully created user' })
         }
     })
 })
-userRouter.get('/user', passport.authenticate('jwt', { session: false }), (req: Request, res: Response) => {
+userRouter.get('/user', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response) => {
     getUserByLogin(req.body).then((response: User | null) => {
         if (response === null) {
-            res.status(500).json({ success: false, message: 'Could not get user details' });
+            return res.status(500).json({ success: false, message: 'Could not get user details' });
         } else {
-            res.status(200).json({
+            const idCookie = cookie.serialize('userId', response._id, {
+                httpOnly: true,
+                maxAge: 3600 * 24 * 7 // wazne przez tydzien
+            })
+            const accountIdsCookies = cookie.serialize('accountIds', JSON.stringify(response.bankAccounts), {
+                httpOnly: true,
+                maxAge: 3600 * 24 * 7
+            })
+            const responseData = { // usuwam wrazliwe dane
+                ...response.toObject(),
+                _id: undefined,
+                bankAccounts: undefined
+            };
+            res.setHeader('userId', idCookie)
+            res.setHeader('bankAccountsIds', accountIdsCookies)
+            return res.status(200).json({
                 message: 'Successfully retrieved the user details',
-                response,
+                responseData,
                 success: true,
             });
         }

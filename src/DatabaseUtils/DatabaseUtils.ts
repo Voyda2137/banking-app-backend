@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, {Document} from "mongoose";
 import dotenv from "dotenv";
 import {UserModel, User} from "../models/UserInterface";
 import {BankAccount, BankAccountModel} from "../models/AccountInterface";
@@ -17,6 +17,19 @@ export const connectToMongo = () => {
     }
     else console.log('Cannot connect to mongo')
 }
+
+/**
+ * Remove MongoDB-specific fields from a document object.
+ * Retains the _id field.
+ * @param doc The document object to clean.
+ * @returns The cleaned object.
+ */
+export const cleanMongoDocument = async <T extends Document>(
+    doc: T
+): Promise<Omit<T, keyof Document> & { _id: T['_id'] }> => {
+    const { _id, ...cleanedObject } = doc.toObject();
+    return { _id, ...cleanedObject };
+};
 export const createUser = async (userData: User): Promise<User | null> => {
     try {
         const { login, email, password } = userData;
@@ -42,7 +55,7 @@ export const getUserByLogin = async (login: string): Promise<User | null> => {
     try {
         const user = await UserModel.findOne({ login });
         if (user) {
-            return user.toObject()
+            return await cleanMongoDocument(user) as User
         } else {
             return null;
         }
