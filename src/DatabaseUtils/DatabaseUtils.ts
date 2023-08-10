@@ -18,18 +18,6 @@ export const connectToMongo = () => {
     else console.log('Cannot connect to mongo')
 }
 
-/**
- * Remove MongoDB-specific fields from a document object.
- * Retains the _id field.
- * @param doc The document object to clean.
- * @returns The cleaned object.
- */
-export const cleanMongoDocument = async <T extends Document>(
-    doc: T
-): Promise<Omit<T, keyof Document>> => {
-    return doc.toObject();
-};
-
 export const createUser = async (userData: User): Promise<User | null> => {
     try {
         const { login, email, password } = userData;
@@ -55,7 +43,7 @@ export const getUserByLogin = async (login: string): Promise<User | null> => {
     try {
         const user = await UserModel.findOne({ login: login });
         if (user) {
-            return await cleanMongoDocument(user) as User
+            return user
         } else {
             return null;
         }

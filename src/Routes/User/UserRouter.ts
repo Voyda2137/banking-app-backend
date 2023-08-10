@@ -1,8 +1,7 @@
 import {Router, Request, Response} from "express";
 import {authenticateUser} from "../../UserUtils/Authenticator";
-import {createUser, getUserByLogin} from "../../DatabaseUtils/DatabaseUtils";
+import { createUser, getUserByLogin} from "../../DatabaseUtils/DatabaseUtils";
 import passport from "../../UserUtils/Authorizer";
-import {User} from "../../models/UserInterface";
 import {validateRequestProperties} from "../../Validators/Validators";
 import cookie from 'cookie'
 
@@ -60,13 +59,16 @@ userRouter.get('/user', passport.authenticate('jwt', { session: false }), async 
             maxAge: 3600 * 24 * 7
         });
 
-        const responseData = { // usuwam wrazliwe dane
-            ...response.toObject(),
-            _id: undefined,
-            bankAccounts: undefined
-        };
-
         res.setHeader('Set-Cookie', [idCookie, accountIdsCookies]); // Set cookies
+
+        const responseData = {
+            userId: response.userId,
+            name: response.name,
+            surname: response.surname,
+            email: response.email,
+            address: response.address,
+            phoneNumber: response.phoneNumber,
+        };
 
         return res.status(200).json({
             message: 'Successfully retrieved the user details',
