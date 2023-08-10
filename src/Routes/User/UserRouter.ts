@@ -60,13 +60,13 @@ userRouter.get('/user', passport.authenticate('jwt', { session: false }), async 
             secure: true
         });
 
-        const accountIdsCookies = cookie.serialize('accountIds', JSON.stringify(response.bankAccounts), {
+        const accountIdsCookie = cookie.serialize('accountIds', JSON.stringify(response.bankAccounts), {
             httpOnly: true,
             maxAge: 3600 * 24 * 7,
             secure: true
         });
 
-        res.cookie('Set-Cookie', [idCookie, accountIdsCookies]); // Set cookies
+        res.setHeader('Set-Cookie', [idCookie, accountIdsCookie]);
 
         const responseData = {
             userId: response.userId,
