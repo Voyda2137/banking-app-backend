@@ -43,32 +43,39 @@ userRouter.post('/register', async (req: Request, res: Response) => {
     })
 })
 userRouter.get('/user', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response) => {
-    getUserByLogin(req.body).then((response: User | null) => {
-        if (response === null) {
-            return res.status(500).json({ success: false, message: 'Could not get user details' });
-        } else {
-            const idCookie = cookie.serialize('userId', response._id, {
-                httpOnly: true,
-                maxAge: 3600 * 24 * 7 // wazne przez tydzien
-            })
-            const accountIdsCookies = cookie.serialize('accountIds', JSON.stringify(response.bankAccounts), {
-                httpOnly: true,
-                maxAge: 3600 * 24 * 7
-            })
-            const responseData = { // usuwam wrazliwe dane
-                ...response.toObject(),
-                _id: undefined,
-                bankAccounts: undefined
-            };
-            res.setHeader('userId', idCookie)
-            res.setHeader('bankAccountsIds', accountIdsCookies)
-            return res.status(200).json({
-                message: 'Successfully retrieved the user details',
-                responseData,
-                success: true,
-            });
-        }
-    });
-});
+    try {
+        const response = await getUserByLogin(req.body.login);
 
+        if (!response) {
+            return res.status(500).json({ success: false, message: 'Could not get user details' });
+        }
+
+        const idCookie = cookie.serialize('userId', response._id.toString(), {
+            httpOnly: true,
+            maxAge: 3600 * 24 * 7 // wazne przez tydzien
+        });
+
+        const accountIdsCookies = cookie.serialize('accountIds', JSON.stringify(response.bankAccounts), {
+            httpOnly: true,
+            maxAge: 3600 * 24 * 7
+        });
+
+        const responseData = { // usuwam wrazliwe dane
+            ...response.toObject(),
+            _id: undefined,
+            bankAccounts: undefined
+        };
+
+        res.setHeader('Set-Cookie', [idCookie, accountIdsCookies]); // Set cookies
+
+        return res.status(200).json({
+            message: 'Successfully retrieved the user details',
+            responseData,
+            success: true,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'An error occurred while processing the request' });
+    }
+});
 export default userRouter
