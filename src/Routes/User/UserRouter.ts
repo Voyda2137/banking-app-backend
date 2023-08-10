@@ -54,19 +54,17 @@ userRouter.get('/user', passport.authenticate('jwt', { session: false }), async 
             return res.status(500).json({ success: false, message: 'Could not get user details' });
         }
 
-        const idCookie = cookie.serialize('userId', response._id.toString(), {
+        res.cookie('userId', response._id.toString(), {
             httpOnly: true,
-            maxAge: 3600 * 24 * 7, // wazne przez tydzien
+            maxAge: 3600 * 24 * 7, // valid for a week
             secure: true
         });
 
-        const accountIdsCookies = cookie.serialize('accountIds', JSON.stringify(response.bankAccounts), {
+        res.cookie('accountIds', JSON.stringify(response.bankAccounts), {
             httpOnly: true,
-            maxAge: 3600 * 24 * 7,
+            maxAge: 3600 * 24 * 7, // valid for a week
             secure: true
         });
-
-        res.cookie('Set-Cookie', [idCookie, accountIdsCookies]); // Set cookies
 
         const responseData = {
             userId: response.userId,
