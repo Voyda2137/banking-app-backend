@@ -26,10 +26,10 @@ export const connectToMongo = () => {
  */
 export const cleanMongoDocument = async <T extends Document>(
     doc: T
-): Promise<Omit<T, keyof Document> & { _id: T['_id'] }> => {
-    const { _id, ...cleanedObject } = doc.toObject();
-    return { _id, ...cleanedObject };
+): Promise<Omit<T, keyof Document>> => {
+    return doc.toObject();
 };
+
 export const createUser = async (userData: User): Promise<User | null> => {
     try {
         const { login, email, password } = userData;
