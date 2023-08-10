@@ -20,8 +20,13 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     if (response === null) {
         return res.status(401).json({ success: false, message: 'User not found or invalid password' });
     }
+    res.cookie('jwt', response.token, {
+        httpOnly: true,
+        maxAge: 3600 * 1000,
+        secure: true
+    });
 
-    return res.status(200).json({ success: true, token: response.token });
+    return res.status(200).json({ success: true });
 });
 
 userRouter.post('/register', async (req: Request, res: Response) => {
@@ -51,15 +56,17 @@ userRouter.get('/user', passport.authenticate('jwt', { session: false }), async 
 
         const idCookie = cookie.serialize('userId', response._id.toString(), {
             httpOnly: true,
-            maxAge: 3600 * 24 * 7 // wazne przez tydzien
+            maxAge: 3600 * 24 * 7, // wazne przez tydzien
+            secure: true
         });
 
         const accountIdsCookies = cookie.serialize('accountIds', JSON.stringify(response.bankAccounts), {
             httpOnly: true,
-            maxAge: 3600 * 24 * 7
+            maxAge: 3600 * 24 * 7,
+            secure: true
         });
 
-        res.setHeader('Set-Cookie', [idCookie, accountIdsCookies]); // Set cookies
+        res.cookie('Set-Cookie', [idCookie, accountIdsCookies]); // Set cookies
 
         const responseData = {
             userId: response.userId,
