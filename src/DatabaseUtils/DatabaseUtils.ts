@@ -53,7 +53,7 @@ export const createUser = async (userData: User): Promise<User | null> => {
 };
 export const getUserByLogin = async (login: string): Promise<User | null> => {
     try {
-        const user = await UserModel.findOne({ login });
+        const user = await UserModel.findOne({ login: login });
         if (user) {
             return await cleanMongoDocument(user) as User
         } else {
@@ -85,7 +85,7 @@ export const createBankAccount = async (accountData: BankAccount) : Promise<Bank
 }
 export const getUserAccounts = async (userId: string): Promise<BankAccount[] | null> => {
     try{
-        const user = await UserModel.findOne({userId})
+        const user = await UserModel.findOne({ _id: userId})
         const accounts: BankAccount[] = []
         if(user){
             if(user.bankAccounts.length > 0){
