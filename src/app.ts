@@ -10,7 +10,7 @@ const cors = require('cors')
 
 app.use(express.json())
 app.use(passport.initialize())
-app.use(cors());
+app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 
 // user
 app.use('/user', userRouter)
