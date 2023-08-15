@@ -124,7 +124,11 @@ export const getTransactionsForUser = async (userId: string) => {
 
     }
     catch (e) {
-        console.log(e)
+        if (e instanceof mongoose.Error.ValidationError) {
+            console.log('Validation Errors:', e.errors);
+        } else {
+            console.log('Other Error:', e);
+        }
         return null
     }
 }
