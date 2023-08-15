@@ -1,9 +1,10 @@
 import mongoose, {Document} from "mongoose";
 import dotenv from "dotenv";
-import {UserModel, User} from "../models/UserInterface";
-import {BankAccount, BankAccountModel} from "../models/AccountInterface";
+import {UserModel, User} from "../../models/UserInterface";
+import {BankAccount, BankAccountModel} from "../../models/AccountInterface";
 import {generateBankAccountNumber} from "../AccountUtils/AccountUtils";
 import moment from "moment"
+import {Transaction, TransactionModel} from "../../models/TransactionInterface";
 const bcrypt = require('bcrypt')
 
 dotenv.config()
@@ -17,7 +18,6 @@ export const connectToMongo = () => {
     }
     else console.log('Cannot connect to mongo')
 }
-
 export const createUser = async (userData: User): Promise<User | null> => {
     try {
         const { login, email, password } = userData;
@@ -51,7 +51,6 @@ export const getUserByLogin = async (login: string): Promise<User | null> => {
         return null;
     }
 };
-
 export const createBankAccount = async (accountData: BankAccount) : Promise<BankAccount | null> => {
     try {
         const account = {
@@ -93,10 +92,36 @@ export const getUserAccounts = async (userId: string): Promise<BankAccount[] | n
 }
 export const addAccountToUser = async (userId: string, bankAccId: string) => {
     try {
-        console.log('userId:',userId, 'bankId', bankAccId)
         return await UserModel.updateOne({_id: userId}, {$push: {bankAccounts: bankAccId}})
     }
     catch(e){
+        return null
+    }
+}
+export const createTransaction = async (transactionData: Transaction)=> {
+    try {
+        const newTransaction = new TransactionModel(transactionData)
+        return await newTransaction.save()
+    }
+    catch (e) {
+        console.log(e)
+        return null
+    }
+}
+export const getTransactionsForUser = async (userId: string) => {
+    try {
+        const transactions: Transaction[] = await TransactionModel.find({
+            $or: [
+                {sender: userId},
+                {destinationAccount: userId}
+            ]
+        }).exec()
+        if(!transactions) return 1
+        else return transactions
+
+    }
+    catch (e) {
+        console.log(e)
         return null
     }
 }

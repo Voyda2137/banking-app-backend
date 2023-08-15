@@ -1,4 +1,4 @@
-import { User, UserModel } from "../models/UserInterface";
+import { User, UserModel } from "../../models/UserInterface";
 import { generateToken } from "./JWTgenerator";
 import { Document } from 'mongoose';
 const bcrypt = require('bcrypt')

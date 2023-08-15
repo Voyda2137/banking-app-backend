@@ -1,7 +1,7 @@
 import {Router, Request, Response} from "express";
-import {authenticateUser} from "../../UserUtils/Authenticator";
-import { createUser, getUserByLogin} from "../../DatabaseUtils/DatabaseUtils";
-import passport from "../../UserUtils/Authorizer";
+import {authenticateUser} from "../../Utils/UserUtils/Authenticator";
+import { createUser, getUserByLogin } from "../../Utils/DatabaseUtils/DatabaseUtils";
+import passport from "../../Utils/UserUtils/Authorizer";
 import {validateRequestProperties} from "../../Validators/Validators";
 
 const userRouter = Router()
