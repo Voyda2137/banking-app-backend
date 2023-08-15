@@ -29,9 +29,9 @@ export interface Transaction extends Document {
 }
 
 const transactionSchema = new Schema<Transaction>({
-    transactionType: { type: Number, required: true, enum: Object.values(transactionTypes) },
+    transactionType: { type: Number, required: true, enum: transactionTypes },
     amount: { type: Number, required: true },
-    currency: { type: Number, required: true, enum: Object.values(currencyTypes) },
+    currency: { type: Number, required: true, enum: currencyTypes },
     date: { type: Number, required: true, default: +moment() }, // so that all transactions dates are the current time
     sender: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
     receiver: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
