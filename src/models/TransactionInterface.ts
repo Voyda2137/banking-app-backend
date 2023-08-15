@@ -25,6 +25,7 @@ export interface Transaction extends Document {
     createdAt: number;
     updatedAt: typeof transactionUpdateSchema[];
     isRepeating: boolean;
+    repeatsEvery: number;
 }
 
 const transactionSchema = new Schema<Transaction>({
@@ -40,7 +41,8 @@ const transactionSchema = new Schema<Transaction>({
     description: { type: String },
     createdAt: { type: Number, required: true, default: +moment() }, // useful when transaction is supposed to be in the future
     updatedAt: [transactionUpdateSchema], // useful for keeping track of transcation updates
-    isRepeating: {type: Boolean, default: false}
+    isRepeating: {type: Boolean, default: false},
+    repeatsEvery: {type: Number, default: null}
 });
 
 export const TransactionModel = mongoose.model<Transaction>("transactions", transactionSchema);

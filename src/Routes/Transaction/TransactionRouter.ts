@@ -8,16 +8,32 @@ const transactionRouter = Router()
 
 transactionRouter.post('/create', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response) => {
     try {
-        const expectedProperties = [
-            'transactionType',
-            'amount',
-            'currency',
-            'sender',
-            'receiver',
-            'sourceAccount',
-            'destinationAccount',
-            'title'
-        ]
+        let expectedProperties
+        if(req.body.isRepeating){
+            expectedProperties = [
+                'transactionType',
+                'amount',
+                'currency',
+                'sender',
+                'receiver',
+                'sourceAccount',
+                'destinationAccount',
+                'title',
+                'repeatsEvery'
+            ]
+        }
+        else {
+            expectedProperties = [
+                'transactionType',
+                'amount',
+                'currency',
+                'sender',
+                'receiver',
+                'sourceAccount',
+                'destinationAccount',
+                'title'
+            ]
+        }
         const validateRequest = await validateRequestProperties(req.body, expectedProperties)
 
         if(!validateRequest.success){
