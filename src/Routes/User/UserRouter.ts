@@ -3,7 +3,6 @@ import {authenticateUser} from "../../UserUtils/Authenticator";
 import { createUser, getUserByLogin} from "../../DatabaseUtils/DatabaseUtils";
 import passport from "../../UserUtils/Authorizer";
 import {validateRequestProperties} from "../../Validators/Validators";
-import cookie from 'cookie'
 
 const userRouter = Router()
 
@@ -23,12 +22,11 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     res.cookie('jwt', response.token, {
         httpOnly: true,
         maxAge: 3600 * 1000,
-        secure: true
+        // secure: true
     });
 
     return res.status(200).json({ success: true });
 });
-
 userRouter.post('/register', async (req: Request, res: Response) => {
     const expectedProperties = ['name', 'surname', 'email', 'address', 'phoneNumber', 'login', 'password']
     const validateRequest = await validateRequestProperties(req.body, expectedProperties)
