@@ -21,6 +21,7 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     }
     res.cookie('jwt', response.token, {
         httpOnly: true,
+        sameSite: 'none',
         maxAge: 3600 * 1000,
         // secure: true
     });
