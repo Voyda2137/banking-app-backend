@@ -1,6 +1,6 @@
 import {Router, Request, Response} from "express";
-import {addAccountToUser, createBankAccount, getUserAccounts} from "../../DatabaseUtils/DatabaseUtils";
-import passport from "../../UserUtils/Authorizer"
+import {addAccountToUser, createBankAccount, getUserAccounts} from "../../Utils/DatabaseUtils/DatabaseUtils";
+import passport from "../../Utils/UserUtils/Authorizer"
 
 const bankAccountRouter = Router()
 
