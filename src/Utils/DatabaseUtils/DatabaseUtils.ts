@@ -100,6 +100,9 @@ export const addAccountToUser = async (userId: string, bankAccId: string) => {
 }
 export const createTransaction = async (transactionData: Transaction)=> {
     try {
+        if (moment(transactionData.date).isBefore(moment())){
+            return null
+        }
         const newTransaction = new TransactionModel(transactionData)
         return await newTransaction.save()
     }
