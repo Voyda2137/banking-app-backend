@@ -19,14 +19,14 @@ userRouter.post('/login', async (req: Request, res: Response) => {
     if (response === null) {
         return res.status(401).json({ success: false, message: 'User not found or invalid password' });
     }
-    res.cookie('jwt', response.token, {
-        httpOnly: true,
-        sameSite: 'none',
-        maxAge: 3600 * 1000,
-        // secure: true
-    });
+    // res.cookie('jwt', response.token, {
+    //     httpOnly: true,
+    //     sameSite: 'none',
+    //     maxAge: 3600 * 1000,
+    //     // secure: true
+    // });
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, token: response.token }); // not optimal
 });
 userRouter.post('/register', async (req: Request, res: Response) => {
     const expectedProperties = ['name', 'surname', 'email', 'address', 'phoneNumber', 'login', 'password']
