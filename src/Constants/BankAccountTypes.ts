@@ -1,0 +1,6 @@
+export enum bankAccountTypes {
+    CHECKING_ACCOUNT = 0,
+    SAVINGS_ACCOUNT = 1,
+    MONEY_MARKET_ACCOUNT  = 2,
+    CERTIFICATE_OF_DEPOSIT = 3
+}

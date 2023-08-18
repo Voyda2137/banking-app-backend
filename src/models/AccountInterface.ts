@@ -1,11 +1,14 @@
 import mongoose, { Schema, Document } from "mongoose";
+import {bankAccountStatusTypes} from "../Constants/BankAccountStatusCodes";
+import {currencyTypes} from "../Constants/CurrencyTypes";
+import {bankAccountTypes} from "../Constants/BankAccountTypes";
 
 export interface BankAccount extends Document {
     accountNumber: string;
     balance: number;
-    currency: string;
-    type: string;
-    accountStatus: string;
+    currency: currencyTypes;
+    type: bankAccountTypes;
+    status: bankAccountStatusTypes;
     createdAt: number;
     updatedAt: number;
 }
@@ -13,9 +16,9 @@ export interface BankAccount extends Document {
 const bankAccountSchema = new Schema<BankAccount>({
     accountNumber: { type: String, required: true },
     balance: { type: Number, required: true },
-    currency: { type: String, required: true },
-    type: { type: String, required: true },
-    accountStatus: { type: String, required: true },
+    currency: { type: Number, required: true, enum: currencyTypes },
+    type: { type: Number, required: true, enum: bankAccountTypes },
+    status: { type: Number, required: true, enum: bankAccountStatusTypes },
     createdAt: { type: Number, required: true },
     updatedAt: { type: Number, required: true },
 });

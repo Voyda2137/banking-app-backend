@@ -2,7 +2,6 @@ import mongoose, { Schema, Document } from "mongoose";
 import {BankAccount} from "./AccountInterface";
 
 export interface User extends Document {
-    userId: string,
     name: string;
     surname: string;
     email: string;
@@ -11,6 +10,7 @@ export interface User extends Document {
     login: string;
     password: string;
     bankAccounts: [{type: mongoose.Schema.Types.ObjectId, ref: "BankAccount"}];
+    transactions: [{type: mongoose.Schema.Types.ObjectId, ref: "Transaction"}]
 }
 
 const userSchema = new Schema<User>({
@@ -22,6 +22,7 @@ const userSchema = new Schema<User>({
     login: { type: String, required: true },
     password: { type: String, required: true },
     bankAccounts: [{ type: mongoose.Schema.Types.ObjectId, default: [], ref: 'BankAccount' }],
+    transactions: [{ type: mongoose.Schema.Types.ObjectId, default: [], ref: 'Transaction' }],
 });
 
 export const UserModel = mongoose.model<User>("users", userSchema);
