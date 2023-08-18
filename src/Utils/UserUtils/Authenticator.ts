@@ -1,6 +1,7 @@
 import { User, UserModel } from "../../models/UserInterface";
 import { generateToken } from "./JWTgenerator";
 import { Document } from 'mongoose';
+import {validateRequestProperties} from "../../Validators/Validators";
 const bcrypt = require('bcrypt')
 
 
@@ -19,13 +20,13 @@ export const authenticateUser = async ({ login, password }: { login: string, pas
         const user = await UserModel.findOne({ login });
 
         if (!user) {
-            return null;
+            throw new Error('User not found');
         }
 
         const validatePassword = await bcrypt.compare(password, user.password);
 
         if (!validatePassword) {
-            return null;
+            throw new Error('Invalid password');
         }
 
         const token = generateToken(user);
@@ -36,9 +37,14 @@ export const authenticateUser = async ({ login, password }: { login: string, pas
         } as AuthenticatedUser & Document<any>;
 
         return authenticatedUser;
-    } catch (error) {
-        console.error("Error in authenticateUser:", error);
-        return null;
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            throw new Error(e.message);
+        }
+        else {
+            throw new Error('Could not authenticate the user');
+        }
     }
 };
 

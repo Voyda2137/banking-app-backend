@@ -5,6 +5,8 @@ import {BankAccount, BankAccountModel} from "../../models/AccountInterface";
 import {generateBankAccountNumber} from "../AccountUtils/AccountUtils";
 import moment from "moment"
 import {Transaction, TransactionModel} from "../../models/TransactionInterface";
+import {validateRequestProperties} from "../../Validators/Validators";
+import {bankAccountStatusTypes} from "../../Constants/BankAccountStatusCodes";
 const bcrypt = require('bcrypt')
 
 dotenv.config()
@@ -25,7 +27,7 @@ export const createUser = async (userData: User): Promise<User | null> => {
         const existingUser = await UserModel.findOne({ $or: [{ login }, { email }] });
 
         if (existingUser) {
-            return null;
+            throw new Error('User with this login or email already exists')
         }
 
         const saltRounds = 10;
@@ -35,20 +37,20 @@ export const createUser = async (userData: User): Promise<User | null> => {
         return await newUser.save();
 
     } catch (e) {
-        console.log(e)
-        return null;
+        console.error('Could not create user', e)
+        return null
     }
 };
-export const getUserByLogin = async (login: string): Promise<User | null> => {
+export const getUserByLogin = async (data: { login: string }): Promise<User | null> => {
     try {
-        const user = await UserModel.findOne({ login: login });
+        const user = await UserModel.findOne({ login: data.login });
         if (user) {
             return user
         } else {
             return null;
         }
     } catch (e) {
-        return null;
+        throw new Error('Could not get user: ' + e);
     }
 };
 export const createBankAccount = async (accountData: BankAccount) : Promise<BankAccount | null> => {
@@ -58,7 +60,7 @@ export const createBankAccount = async (accountData: BankAccount) : Promise<Bank
             balance: 0,
             currency: accountData.currency,
             type: accountData.type,
-            accountStatus: accountData.accountStatus,
+            status: bankAccountStatusTypes.ACTIVE,
             createdAt: moment().valueOf(),
             updatedAt: moment().valueOf()
         }
@@ -66,13 +68,13 @@ export const createBankAccount = async (accountData: BankAccount) : Promise<Bank
         return await newBankAccount.save()
     }
     catch (e){
-        console.log(e)
+        console.error('Could not create an account ', e)
         return null
     }
 }
-export const getUserAccounts = async (userId: string): Promise<BankAccount[] | null> => {
+export const getUserAccounts = async (data: {userId: string}): Promise<BankAccount[]> => {
     try{
-        const user = await UserModel.findOne({ _id: userId})
+        const user = await UserModel.findOne({ _id: data.userId})
         const accounts: BankAccount[] = []
         if(user){
             if(user.bankAccounts.length > 0){
@@ -87,10 +89,10 @@ export const getUserAccounts = async (userId: string): Promise<BankAccount[] | n
         return accounts
     }
     catch (e) {
-        return null
+        throw new Error('Could not get user accounts')
     }
 }
-export const addAccountToUser = async (userId: string, bankAccId: string) => {
+export const addAccountToUser = async ({userId, bankAccId}: { userId: string, bankAccId: string }) => {
     try {
         return await UserModel.updateOne({_id: userId}, {$push: {bankAccounts: bankAccId}})
     }
@@ -100,23 +102,24 @@ export const addAccountToUser = async (userId: string, bankAccId: string) => {
 }
 export const createTransaction = async (transactionData: Transaction)=> {
     try {
-        if (moment(transactionData.date).isBefore(moment())){
-            return null
-        }
         const newTransaction = new TransactionModel(transactionData)
         return await newTransaction.save()
     }
     catch (e) {
-        console.log(e)
-        return null
+        if (e instanceof Error) {
+            throw new Error('Could not create a transaction: ' + e.message);
+        }
+        else {
+            throw new Error('Could not create a transaction');
+        }
     }
 }
-export const getTransactionsForUser = async (userId: string) => {
+export const getTransactionsForUser = async (data: {userId: string}) => {
     try {
         const transactions: Transaction[] = await TransactionModel.find({
             $or: [
-                {sender: userId},
-                {destinationAccount: userId}
+                {sender: data.userId},
+                {destinationAccount: data.userId}
             ]
         }).exec()
         if(!transactions) return 1
@@ -125,10 +128,10 @@ export const getTransactionsForUser = async (userId: string) => {
     }
     catch (e) {
         if (e instanceof mongoose.Error.ValidationError) {
-            console.log('Validation Errors:', e.errors);
-        } else {
-            console.log('Other Error:', e);
+            throw new Error('Could not get user transactions: ' + e.errors);
         }
-        return null
+        else {
+            throw new Error('Could not get user transactions: ' + e);
+        }
     }
 }
