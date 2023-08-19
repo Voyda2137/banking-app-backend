@@ -22,7 +22,7 @@ const errorHandler = (err, req, res, next) => {
 };
 app.use(express_1.default.json());
 app.use(Authorizer_1.default.initialize());
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(cors({ credentials: true, origin: ['http://localhost:2137', 'https://mg-banking.pl'] }));
 app.use(enforce.HTTPS({ trustProtoHeader: true }));
 app.use('/user', UserRouter_1.default);
 app.use('/accounts', BankAccountRouter_1.default);
