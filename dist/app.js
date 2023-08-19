@@ -12,6 +12,7 @@ const TransactionRouter_1 = __importDefault(require("./Routes/Transaction/Transa
 const app = (0, express_1.default)();
 const port = process.env.PORT;
 const cors = require('cors');
+const enforce = require('express-sslify');
 const errorHandler = (err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
@@ -22,6 +23,7 @@ const errorHandler = (err, req, res, next) => {
 app.use(express_1.default.json());
 app.use(Authorizer_1.default.initialize());
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(enforce.HTTPS({ trustProtoHeader: true }));
 app.use('/user', UserRouter_1.default);
 app.use('/accounts', BankAccountRouter_1.default);
 app.use('/transactions', TransactionRouter_1.default);

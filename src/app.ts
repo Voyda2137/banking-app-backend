@@ -8,6 +8,7 @@ import transactionRouter from "./Routes/Transaction/TransactionRouter";
 const app: Express = express()
 const port = process.env.PORT
 const cors = require('cors')
+const enforce = require('express-sslify')
 
 const errorHandler =  (err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack)
@@ -21,6 +22,7 @@ const errorHandler =  (err: Error, req: Request, res: Response, next: NextFuncti
 app.use(express.json())
 app.use(passport.initialize())
 app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(enforce.HTTPS({trustProtoHeader: true}))
 
 app.use('/user', userRouter)
 app.use('/accounts', BankAccountRouter)
