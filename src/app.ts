@@ -8,7 +8,18 @@ import transactionRouter from "./Routes/Transaction/TransactionRouter";
 const app: Express = express()
 const port = process.env.PORT
 const cors = require('cors')
-const enforce = require('express-sslify')
+// const enforce = require('express-sslify')
+
+const httpsEnforcer = (req: Request, res: Response, next: NextFunction) => {
+    if (req.header('x-forwarded-proto') !== undefined && req.header('x-forwarded-proto') !== 'https') {
+        if (req.header('host') !== 'localhost') {
+            res.redirect(`https://${req.header('host')}${req.url}`);
+        }
+    } else {
+        next();
+    }
+};
+
 
 const errorHandler =  (err: Error, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack)
@@ -19,10 +30,11 @@ const errorHandler =  (err: Error, req: Request, res: Response, next: NextFuncti
     })
 }
 
+app.use(httpsEnforcer)
 app.use(express.json())
 app.use(passport.initialize())
 app.use(cors({credentials: true, origin: ['http://localhost:2137', 'https://mg-banking.pl']}));
-app.use(enforce.HTTPS({trustProtoHeader: true}))
+// app.use(enforce.HTTPS({trustProtoHeader: true}))
 
 app.use('/user', userRouter)
 app.use('/accounts', BankAccountRouter)
