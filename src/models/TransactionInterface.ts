@@ -21,7 +21,7 @@ export interface Transaction extends Document {
     sourceAccount: {type: string, ref: "BankAccount", field: "accountNumber"};
     destinationAccount: {type: string, ref: "BankAccount", field: "accountNumber"};
     title: string;
-    description: string;
+    description?: string;
     createdAt: number;
     updatedAt: typeof transactionUpdateSchema[];
     isRepeating: boolean;

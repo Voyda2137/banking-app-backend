@@ -1,8 +1,9 @@
 import {Router, Request, Response, NextFunction} from "express";
 import {authenticateUser} from "../../Utils/UserUtils/Authenticator";
-import { createUser, getUserByLogin } from "../../Utils/DatabaseUtils/DatabaseUtils";
+import { createUser } from "../../Utils/DatabaseUtils/DatabaseUtils";
 import passport from "../../Utils/UserUtils/Authorizer";
 import {validateRequestProperties} from "../../Validators/Validators";
+import {getUserFromJwt} from "../../Utils/UserUtils/GeneralUtils";
 
 const userRouter = Router()
 
@@ -45,7 +46,7 @@ userRouter.post('/register', async (req: Request, res: Response, next: NextFunct
                 return res.status(200).json({ success: true, message: 'Successfully created user' })
             }
             else {
-                return res.status(500).json({ success: false, message: 'Failed to create user' });
+                return res.status(500).json({ success: false, message: 'User with this login or email already exists' });
             }
         })
     }
@@ -55,14 +56,10 @@ userRouter.post('/register', async (req: Request, res: Response, next: NextFunct
 })
 userRouter.get('/user', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const expectedProperties = ['login']
-        const validateRequest = await validateRequestProperties(req.body, expectedProperties)
 
-        if(!validateRequest.success){
-            throw new Error(validateRequest.message)
-        }
+        const authHeader: string | undefined = req.header('Authorization')
 
-        const response = await getUserByLogin(req.body);
+        const response = await getUserFromJwt(authHeader)
 
         if (response) {
             const responseData = {
