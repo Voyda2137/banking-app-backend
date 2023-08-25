@@ -12,7 +12,17 @@ const TransactionRouter_1 = __importDefault(require("./Routes/Transaction/Transa
 const app = (0, express_1.default)();
 const port = process.env.PORT;
 const cors = require('cors');
-const enforce = require('express-sslify');
+// const enforce = require('express-sslify')
+const httpsEnforcer = (req, res, next) => {
+    if (req.header('x-forwarded-proto') !== undefined && req.header('x-forwarded-proto') !== 'https') {
+        if (req.header('host') !== 'localhost') {
+            res.redirect(`https://${req.header('host')}${req.url}`);
+        }
+    }
+    else {
+        next();
+    }
+};
 const errorHandler = (err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
@@ -20,10 +30,11 @@ const errorHandler = (err, req, res, next) => {
         message: err.message
     });
 };
+// app.use(httpsEnforcer)
 app.use(express_1.default.json());
 app.use(Authorizer_1.default.initialize());
 app.use(cors({ credentials: true, origin: ['http://localhost:2137', 'https://mg-banking.pl'] }));
-app.use(enforce.HTTPS({ trustProtoHeader: true }));
+// app.use(enforce.HTTPS({trustProtoHeader: true}))
 app.use('/user', UserRouter_1.default);
 app.use('/accounts', BankAccountRouter_1.default);
 app.use('/transactions', TransactionRouter_1.default);

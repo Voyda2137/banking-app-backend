@@ -2,6 +2,7 @@ import {Router, Request, Response, NextFunction} from "express";
 import {addAccountToUser, createBankAccount, getUserAccounts} from "../../Utils/DatabaseUtils/DatabaseUtils";
 import passport from "../../Utils/UserUtils/Authorizer"
 import {validateRequestProperties} from "../../Validators/Validators";
+import {getUserFromJwt} from "../../Utils/UserUtils/GeneralUtils";
 
 const bankAccountRouter = Router()
 
@@ -10,12 +11,19 @@ bankAccountRouter.post('/create', passport.authenticate('jwt', { session: false 
         const expectedProperties = ['currency', 'type']
         const validateRequest = await validateRequestProperties(req.body, expectedProperties)
 
+        const authHeader: string | undefined = req.header('Authorization')
+
+        const user = await getUserFromJwt(authHeader)
+        if(!user){
+            throw new Error('Could not verify user')
+        }
+
         if(!validateRequest.success){
             throw new Error(validateRequest.message)
         }
         createBankAccount(req.body).then(response => {
             if(response){
-                addAccountToUser({userId: req.body.userId, bankAccId: response._id}).then(() => {
+                addAccountToUser({userId: user._id, bankAccId: response._id}).then(() => {
                     return res.status(200).json({success: true, message: 'Successfully created the bank account'})
                 })
             }
@@ -30,14 +38,14 @@ bankAccountRouter.post('/create', passport.authenticate('jwt', { session: false 
 })
 bankAccountRouter.get('/accounts', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const expectedProperties = ['userId']
-        const validateRequest = await validateRequestProperties(req.body, expectedProperties)
+        const authHeader: string | undefined = req.header('Authorization')
 
-        if(!validateRequest.success){
-            throw new Error(validateRequest.message)
+        const user = await getUserFromJwt(authHeader)
+        if(!user){
+            throw new Error('Could not verify user')
         }
 
-        getUserAccounts(req.body).then(response => {
+        getUserAccounts(user._id).then(response => {
             if(response){
                 res.status(200).json({success: true, message: 'Successfully retrieved user accounts', accounts: response})
             }

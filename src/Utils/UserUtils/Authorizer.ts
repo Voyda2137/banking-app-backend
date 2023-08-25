@@ -1,7 +1,7 @@
 import passport from "passport";
 import dotenv from 'dotenv'
 import {Strategy, ExtractJwt} from "passport-jwt";
-import {UserModel} from "../../models/UserInterface";
+import {User, UserModel} from "../../models/UserInterface";
 
 dotenv.config()
 
@@ -13,7 +13,7 @@ passport.use(new Strategy(jwtOptions, async (payload, done) => {
     try {
         const user = await UserModel.findOne({ login: payload.login });
         if (user) {
-            return done(null, user);
+            return done(null, user as User);
         } else {
             return done(null, false);
         }

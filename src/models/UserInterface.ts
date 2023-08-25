@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 import {BankAccount} from "./AccountInterface";
 
 export interface User extends Document {
+    userId: string;
     name: string;
     surname: string;
     email: string;
@@ -10,10 +11,11 @@ export interface User extends Document {
     login: string;
     password: string;
     bankAccounts: [{type: mongoose.Schema.Types.ObjectId, ref: "BankAccount"}];
-    transactions: [{type: mongoose.Schema.Types.ObjectId, ref: "Transaction"}]
+    transactions: [{type: mongoose.Schema.Types.ObjectId, ref: "Transaction"}];
 }
 
 const userSchema = new Schema<User>({
+    userId: String,
     name: { type: String, required: true },
     surname: { type: String, required: true },
     email: { type: String, required: true },
