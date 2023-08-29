@@ -24,7 +24,9 @@ const httpsEnforcer = (req, res, next) => {
 };
 const errorHandler = (err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({
+    console.log('bledzik');
+    const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
+    res.status(statusCode).json({
         success: false,
         message: err.message
     });

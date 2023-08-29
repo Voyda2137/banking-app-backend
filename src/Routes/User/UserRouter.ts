@@ -1,6 +1,6 @@
 import {Router, Request, Response, NextFunction} from "express";
 import {authenticateUser} from "../../Utils/UserUtils/Authenticator";
-import { createUser } from "../../Utils/DatabaseUtils/DatabaseUtils";
+import {createUser, editUser, getUserByLogin} from "../../Utils/DatabaseUtils/DatabaseUtils";
 import passport from "../../Utils/UserUtils/Authorizer";
 import {validateRequestProperties} from "../../Validators/Validators";
 import {getUserFromJwt} from "../../Utils/UserUtils/GeneralUtils";
@@ -109,4 +109,33 @@ userRouter.get('/user', passport.authenticate('jwt', { session: false }), async 
         next(e)
     }
 });
+userRouter.put('/edit', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const authHeader: string | undefined = req.header('Authorization')
+        const userData = {
+            ...req.body,
+            token: authHeader
+        }
+        const val = await editUser(userData)
+        switch(val){
+            case 0:
+                return res.status(200).json({success: true, message: 'Successfuly changed user data'})
+            case 1:
+                throw new Error('Name has not been changed')
+            case 2:
+                throw new Error('Surname has not been changed')
+            case 3:
+                throw new Error('Email has not been changed')
+            case 4:
+                throw new Error('Password has not been changed')
+            case 5:
+                throw new Error('Phone number has not been changed')
+            case 6:
+                throw new Error('Address has not been changed')
+        }
+    }
+    catch (e) {
+        next(e)
+    }
+})
 export default userRouter
