@@ -8,6 +8,7 @@ import {Transaction, TransactionModel} from "../../models/TransactionInterface";
 import {bankAccountStatusTypes} from "../../Constants/BankAccountStatusCodes";
 import {transactionTypes} from "../../Constants/TransactionTypes";
 import {currencyTypes} from "../../Constants/CurrencyTypes";
+import {getUserFromJwt} from "../UserUtils/GeneralUtils";
 
 const bcrypt = require('bcrypt')
 
@@ -64,6 +65,49 @@ export const getUserById = async (userId: string): Promise<User | null> => {
         throw new Error('Could not get user: ' + e);
     }
 };
+export const editUser = async (
+    {
+        token,
+        name,
+        surname,
+        email,
+        password,
+        phoneNumber,
+        address
+    }: {
+        token: string,
+        name: string,
+        surname: string,
+        email: string,
+        password: string,
+        phoneNumber: number,
+        address: string
+    }
+) => {
+    const user = await getUserFromJwt(token)
+    if(user){
+        try{
+            const modifiedFields: {[key: string]: any} = {}
+            if(name && user.name === name) return 1
+            if(surname && user.surname === surname) return 2
+            if(email && user.email === email) return 3
+            if(password && user.password === password) return 4
+            if(phoneNumber && user.phoneNumber === phoneNumber) return 5
+            if(address && user.address === address) return 6
+            if(name) modifiedFields.name = name
+            if(surname) modifiedFields.surname = surname
+            if(email) modifiedFields.email = email
+            if(password) modifiedFields.password = password
+            if(phoneNumber) modifiedFields.phoneNumber = phoneNumber
+            if(address) modifiedFields.address = address
+            await UserModel.updateOne({_id: user._id}, {$set: modifiedFields})
+            return 0
+        }
+        catch (e) {
+            throw new Error('Error updating user data')
+        }
+    }
+}
 // bank account
 
 export const createBankAccount = async (accountData: BankAccount) : Promise<BankAccount | null> => {
