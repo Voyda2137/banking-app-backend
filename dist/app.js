@@ -12,7 +12,6 @@ const TransactionRouter_1 = __importDefault(require("./Routes/Transaction/Transa
 const app = (0, express_1.default)();
 const port = process.env.PORT;
 const cors = require('cors');
-// const enforce = require('express-sslify')
 const httpsEnforcer = (req, res, next) => {
     if (req.header('x-forwarded-proto') !== undefined && req.header('x-forwarded-proto') !== 'https') {
         if (req.header('host') !== 'localhost') {

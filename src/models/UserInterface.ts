@@ -12,6 +12,8 @@ export interface User extends Document {
     password: string;
     bankAccounts: [{type: mongoose.Schema.Types.ObjectId, ref: "BankAccount"}];
     transactions: [{type: mongoose.Schema.Types.ObjectId, ref: "Transaction"}];
+    birthDate: number;
+    createdAt: number;
 }
 
 const userSchema = new Schema<User>({
@@ -25,6 +27,8 @@ const userSchema = new Schema<User>({
     password: { type: String, required: true },
     bankAccounts: [{ type: mongoose.Schema.Types.ObjectId, default: [], ref: 'BankAccount' }],
     transactions: [{ type: mongoose.Schema.Types.ObjectId, default: [], ref: 'Transaction' }],
+    birthDate: {type: Number, required: true},
+    createdAt: {type: Number}
 });
 
 export const UserModel = mongoose.model<User>("users", userSchema);
