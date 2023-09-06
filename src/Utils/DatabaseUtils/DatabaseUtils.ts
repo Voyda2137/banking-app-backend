@@ -190,7 +190,8 @@ export const createTransaction = async (transactionData: {
     description: string;
     currency: currencyTypes;
     title: string;
-    destinationAccount: string
+    destinationAccount: string,
+    isRepeating: boolean
 })=> {
     try {
         const newTransaction = new TransactionModel(transactionData)

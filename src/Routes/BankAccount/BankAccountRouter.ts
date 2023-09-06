@@ -1,15 +1,18 @@
 import {Router, Request, Response, NextFunction} from "express";
 import {addAccountToUser, createBankAccount, getUserAccounts} from "../../Utils/DatabaseUtils/DatabaseUtils";
 import passport from "../../Utils/UserUtils/Authorizer"
-import {validateRequestProperties} from "../../Validators/Validators";
 import {getUserFromJwt} from "../../Utils/UserUtils/GeneralUtils";
+import {createBankAccountValidator} from "../../Validators/AccountValidator";
+import {validationResult} from "express-validator";
 
 const bankAccountRouter = Router()
 
-bankAccountRouter.post('/create', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
+bankAccountRouter.post('/create', createBankAccountValidator, passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const expectedProperties = ['currency', 'type']
-        const validateRequest = await validateRequestProperties(req.body, expectedProperties)
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
+        }
 
         const authHeader: string | undefined = req.header('Authorization')
 
@@ -18,9 +21,6 @@ bankAccountRouter.post('/create', passport.authenticate('jwt', { session: false 
             throw new Error('Could not verify user')
         }
 
-        if(!validateRequest.success){
-            throw new Error(validateRequest.message)
-        }
         createBankAccount(req.body).then(response => {
             if(response){
                 addAccountToUser({userId: user._id, bankAccId: response._id}).then(() => {
