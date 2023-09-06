@@ -1,20 +1,19 @@
 import {Router, Request, Response, NextFunction} from "express";
 import {authenticateUser} from "../../Utils/UserUtils/Authenticator";
-import {createUser, editUser, getUserByLogin} from "../../Utils/DatabaseUtils/DatabaseUtils";
+import {createUser, editUser} from "../../Utils/DatabaseUtils/DatabaseUtils";
 import passport from "../../Utils/UserUtils/Authorizer";
-import {validateRequestProperties} from "../../Validators/Validators";
 import {getUserFromJwt} from "../../Utils/UserUtils/GeneralUtils";
 import moment from "moment";
+import {editUserValidator, loginUserValidator, registerUserValidator} from "../../Validators/UserValidator";
+import {validationResult} from "express-validator"
 
 const userRouter = Router()
 
-userRouter.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+userRouter.post('/login', loginUserValidator, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const expectedProperties = ['login', 'password']
-        const validateRequest = await validateRequestProperties(req.body, expectedProperties)
-
-        if(!validateRequest.success){
-            throw new Error(validateRequest.message)
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
         }
 
         const response = await authenticateUser(req.body);
@@ -33,34 +32,29 @@ userRouter.post('/login', async (req: Request, res: Response, next: NextFunction
         next(e)
     }
 });
-userRouter.post('/register', async (req: Request, res: Response, next: NextFunction) => {
+userRouter.post('/register', registerUserValidator, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const expectedProperties = ['name', 'surname', 'email', 'address', 'phoneNumber', 'login', 'password', 'birthDate']
-        const validateRequest = await validateRequestProperties(req.body, expectedProperties)
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
+        }
 
-        if(!validateRequest.success){
-            throw new Error(validateRequest.message)
-        }
-        if(moment(req.body.birthDate).isAfter(moment().startOf('d').subtract(18, 'y'))){
-            throw new Error('User is not old enough')
-        }
         const userObject = {
             ...req.body,
-            createdAt: +moment()
+            createdAt: +moment(),
+        };
+
+        const val = await createUser(userObject);
+
+        if (val) {
+            return res.status(200).json({ success: true, message: 'Successfully created user' });
+        } else {
+            return res.status(500).json({ success: false, message: 'User with this login or email already exists' });
         }
-        createUser(userObject).then(val=> {
-            if(val){
-                return res.status(200).json({ success: true, message: 'Successfully created user' })
-            }
-            else {
-                return res.status(500).json({ success: false, message: 'User with this login or email already exists' });
-            }
-        })
+    } catch (e) {
+        next(e);
     }
-    catch (e) {
-        next(e)
-    }
-})
+});
 userRouter.get('/user', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
     try {
 
@@ -109,8 +103,12 @@ userRouter.get('/user', passport.authenticate('jwt', { session: false }), async 
         next(e)
     }
 });
-userRouter.put('/edit', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
+userRouter.put('/edit', editUserValidator, passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
+        }
         const authHeader: string | undefined = req.header('Authorization')
         const userData = {
             ...req.body,
