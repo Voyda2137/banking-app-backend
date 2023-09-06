@@ -1,13 +1,7 @@
-interface ValidationResult {
-    success: boolean,
-    message?: string
-}
-
-export const validateRequestProperties = async (requestObject: object, neccessaryProperties: string[]): Promise<ValidationResult> => {
-    for (const prop of neccessaryProperties) {
-        if(!requestObject.hasOwnProperty(prop)){
-            return {success: false, message: `Error missing property: ${prop}`}
-        }
+export const checkForUnwantedProperties = (value: any, allowedProperties: string[]) => {
+    const unwantedProperties = Object.keys(value).filter((key) => !allowedProperties.includes(key));
+    if (unwantedProperties.length > 0) {
+        throw new Error(`Unexpected properties found: ${unwantedProperties.join(', ')}`);
     }
-    return {success: true}
-}
+    return true;
+};

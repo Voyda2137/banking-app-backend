@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 import {transactionTypes} from "../Constants/TransactionTypes";
 import {currencyTypes} from "../Constants/CurrencyTypes";
 import moment from "moment";
+import {repeatsEveryTypes} from "../Constants/RepeatsEveryTypes";
 
 const transactionUpdateSchema = new Schema({
     updatedAt: {type: Number, default: +moment(), required: true}, // will have the value of request time
@@ -25,7 +26,7 @@ export interface Transaction extends Document {
     createdAt: number;
     updatedAt: typeof transactionUpdateSchema[];
     isRepeating: boolean;
-    repeatsEvery: number;
+    repeatsEvery: { interval: number, unit: repeatsEveryTypes };
 }
 
 const transactionSchema = new Schema<Transaction>({
@@ -40,9 +41,9 @@ const transactionSchema = new Schema<Transaction>({
     title: { type: String, required: true },
     description: { type: String },
     createdAt: { type: Number, required: true, default: +moment() }, // useful when transaction is supposed to be in the future
-    updatedAt: [transactionUpdateSchema], // useful for keeping track of transcation updates
+    updatedAt: [transactionUpdateSchema], // useful for keeping track of transaction updates
     isRepeating: {type: Boolean, default: false},
-    repeatsEvery: {type: Number, default: null}
+    repeatsEvery: {interval: {type: Number}, unit: {type: Number, enum: repeatsEveryTypes}, default: {}}
 });
 
 export const TransactionModel = mongoose.model<Transaction>("transactions", transactionSchema);

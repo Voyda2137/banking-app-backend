@@ -1,5 +1,6 @@
 import {body} from 'express-validator'
 import moment from "moment"
+import {checkForUnwantedProperties} from "./Validators";
 
 const isOldEnough = (value: number) => {
     if (moment(value).isBefore(moment().subtract(18, 'years'))) {
@@ -14,8 +15,9 @@ const doesNotContainWhiteSpaces = (value: string) => {
     }
     return true;
 };
-
+const registerValidFields : string[] = ['name', 'surname', 'email', 'address', 'phoneNumber', 'login', 'password', 'birthDate']
 export const registerUserValidator = [
+    body().custom( val => checkForUnwantedProperties(val, registerValidFields)),
     body('name')
         .notEmpty()
         .isLength({min: 3, max: 20})
@@ -83,7 +85,9 @@ export const registerUserValidator = [
             }
     })
 ]
+const loginValidFields : string[] = ['login', 'password']
 export const loginUserValidator = [
+    body().custom( val => checkForUnwantedProperties(val, loginValidFields)),
     body('login')
         .notEmpty()
         .withMessage('Login cannot be empty'),
