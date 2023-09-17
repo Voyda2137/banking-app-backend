@@ -1,10 +1,15 @@
 import {Router, Request, Response, NextFunction} from "express";
 import {authenticateUser} from "../../Utils/UserUtils/Authenticator";
-import {createUser, editUser} from "../../Utils/DatabaseUtils/DatabaseUtils";
+import {changeUserToService, createUser, editUser} from "../../Utils/DatabaseUtils/DatabaseUtils";
 import passport from "../../Utils/UserUtils/Authorizer";
 import {getUserFromJwt} from "../../Utils/UserUtils/GeneralUtils";
 import moment from "moment";
-import {editUserValidator, loginUserValidator, registerUserValidator} from "../../Validators/UserValidator";
+import {
+    changeUserToServiceValidator,
+    editUserValidator,
+    loginUserValidator,
+    registerUserValidator
+} from "../../Validators/UserValidator";
 import {validationResult} from "express-validator"
 
 const userRouter = Router()
@@ -73,7 +78,8 @@ userRouter.get('/user', passport.authenticate('jwt', { session: false }), async 
                 address: response.address,
                 phoneNumber: response.phoneNumber,
                 birthDate: response.birthDate,
-                createdAt: response.createdAt
+                createdAt: response.createdAt,
+                isService: response.isService
             };
 
             return res.status(200).json({
@@ -130,6 +136,23 @@ userRouter.put('/edit', editUserValidator, passport.authenticate('jwt', { sessio
                 throw new Error('Phone number has not been changed')
             case 6:
                 throw new Error('Address has not been changed')
+        }
+    }
+    catch (e) {
+        next(e)
+    }
+})
+userRouter.put('/addService', changeUserToServiceValidator, passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
+        }
+        const authHeader: string | undefined = req.header('Authorization')
+        if(authHeader){
+            const createdService = await changeUserToService({token: authHeader, login: req.body.login})
+            if(createdService) return res.status(200).json({success: true, message: 'Successfully changed user to service'})
+            else throw new Error('Cannot change user to service')
         }
     }
     catch (e) {
