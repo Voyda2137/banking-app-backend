@@ -127,3 +127,8 @@ export const editUserValidator = [
         .isLength({min: 3, max: 20})
         .withMessage('Address must be between 3 and 20 characters')
 ]
+export const changeUserToServiceValidator = [
+    body('login')
+        .notEmpty()
+        .withMessage('Login cannot be empty')
+]

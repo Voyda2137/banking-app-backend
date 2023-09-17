@@ -8,7 +8,7 @@ import {Transaction, TransactionModel} from "../../models/TransactionInterface";
 import {bankAccountStatusTypes} from "../../Constants/BankAccountStatusCodes";
 import {transactionTypes} from "../../Constants/TransactionTypes";
 import {currencyTypes} from "../../Constants/CurrencyTypes";
-import {getUserFromJwt} from "../UserUtils/GeneralUtils";
+import {extractLoginFromJwt, getUserFromJwt} from "../UserUtils/GeneralUtils";
 
 const bcrypt = require('bcrypt')
 
@@ -107,6 +107,23 @@ export const editUser = async (
             throw new Error('Error updating user data')
         }
     }
+}
+/**
+ *
+ * @param token - service user's jwt
+ * @param login - user to be made a service user
+ * @returns if the function was successful returns 1 else returns 0
+ */
+export const changeUserToService = async ({token, login}: {token: string, login: string}) => {
+    const serviceUser = await getUserFromJwt(token)
+    if(serviceUser?.isService){
+       const futureService = await getUserByLogin(login)
+        if(futureService){
+            await UserModel.updateOne({_id: futureService._id}, {isService: true})
+            return 1
+        }
+    }
+    return 0
 }
 // bank account
 

@@ -14,6 +14,7 @@ export interface User extends Document {
     transactions: [{type: mongoose.Schema.Types.ObjectId, ref: "Transaction"}];
     birthDate: number;
     createdAt: number;
+    isService: boolean;
 }
 
 const userSchema = new Schema<User>({
@@ -28,7 +29,8 @@ const userSchema = new Schema<User>({
     bankAccounts: [{ type: mongoose.Schema.Types.ObjectId, default: [], ref: 'BankAccount' }],
     transactions: [{ type: mongoose.Schema.Types.ObjectId, default: [], ref: 'Transaction' }],
     birthDate: {type: Number, required: true},
-    createdAt: {type: Number}
+    createdAt: {type: Number},
+    isService: {type: Boolean}
 });
 
 export const UserModel = mongoose.model<User>("users", userSchema);
