@@ -11,6 +11,7 @@ import {
     registerUserValidator
 } from "../../Validators/UserValidator";
 import {validationResult} from "express-validator"
+import {generateToken} from "../../Utils/UserUtils/JWTgenerator";
 
 const userRouter = Router()
 
@@ -159,4 +160,13 @@ userRouter.put('/addService', changeUserToServiceValidator, passport.authenticat
         next(e)
     }
 })
+userRouter.post('/refreshToken', passport.authenticate('jwt', { session: false }), (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const newAccessToken = generateToken(req.body);
+        return res.status(200).json({ success: true, token: newAccessToken });
+    }
+    catch (e) {
+        next(e)
+    }
+});
 export default userRouter
