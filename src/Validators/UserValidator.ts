@@ -97,33 +97,33 @@ export const loginUserValidator = [
 ]
 export const editUserValidator = [
     body('name')
-        .optional()
+        .notEmpty()
         .isLength({min: 3, max: 20})
         .withMessage('Name must be between 3 and 20 characters')
         .isAlpha()
         .withMessage('Name must not contain numbers or special characters'),
     body('surname')
-        .optional()
+        .notEmpty()
         .isLength({min: 3, max: 20})
         .withMessage('Surname must be between 3 and 20 characters')
         .isAlpha()
         .withMessage('Surname must not contain numbers or special characters'),
     body('email')
-        .optional()
+        .notEmpty()
         .isEmail()
         .withMessage('Must be a valid email'),
     body('password')
-        .optional()
+        .notEmpty()
         .isLength({min: 3, max: 20})
         .withMessage('Password must be between 3 and 20 characters'),
     body('phoneNumber')
-        .optional()
+        .notEmpty()
         .isLength({min: 9, max: 9})
         .withMessage('Phone number must be 9 numbers long')
         .isNumeric()
         .withMessage('Phone number must only user numbers'),
     body('address')
-        .optional()
+        .notEmpty()
         .isLength({min: 3, max: 20})
         .withMessage('Address must be between 3 and 20 characters')
 ]
