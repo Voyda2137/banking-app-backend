@@ -160,10 +160,15 @@ userRouter.put('/addService', changeUserToServiceValidator, passport.authenticat
         next(e)
     }
 })
-userRouter.post('/refreshToken', passport.authenticate('jwt', { session: false }), (req: Request, res: Response, next: NextFunction) => {
+userRouter.post('/refreshToken', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const newAccessToken = generateToken(req.body);
-        return res.status(200).json({ success: true, token: newAccessToken });
+        const authHeader: string | undefined = req.header('Authorization')
+
+        const response = await getUserFromJwt(authHeader)
+        if(response){
+            const newAccessToken = generateToken(response);
+            return res.status(200).json({ success: true, token: newAccessToken });
+        }
     }
     catch (e) {
         next(e)
