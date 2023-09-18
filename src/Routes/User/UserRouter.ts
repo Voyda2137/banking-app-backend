@@ -122,22 +122,8 @@ userRouter.put('/edit', editUserValidator, passport.authenticate('jwt', { sessio
             token: authHeader
         }
         const val = await editUser(userData)
-        switch(val){
-            case 0:
-                return res.status(200).json({success: true, message: 'Successfuly changed user data'})
-            case 1:
-                throw new Error('Name has not been changed')
-            case 2:
-                throw new Error('Surname has not been changed')
-            case 3:
-                throw new Error('Email has not been changed')
-            case 4:
-                throw new Error('Password has not been changed')
-            case 5:
-                throw new Error('Phone number has not been changed')
-            case 6:
-                throw new Error('Address has not been changed')
-        }
+        if(val) return res.status(200).json({success: true, message: 'Successfuly changed user data'})
+
     }
     catch (e) {
         next(e)

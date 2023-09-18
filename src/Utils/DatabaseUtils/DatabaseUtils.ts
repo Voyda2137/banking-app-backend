@@ -88,20 +88,14 @@ export const editUser = async (
     if(user){
         try{
             const modifiedFields: {[key: string]: any} = {}
-            if(name && user.name === name) return 1
-            if(surname && user.surname === surname) return 2
-            if(email && user.email === email) return 3
-            if(password && user.password === password) return 4
-            if(phoneNumber && user.phoneNumber === phoneNumber) return 5
-            if(address && user.address === address) return 6
-            if(name) modifiedFields.name = name
-            if(surname) modifiedFields.surname = surname
-            if(email) modifiedFields.email = email
-            if(password) modifiedFields.password = password
-            if(phoneNumber) modifiedFields.phoneNumber = phoneNumber
-            if(address) modifiedFields.address = address
+            if(name && user.name !== name) modifiedFields.name = name
+            if(surname && user.surname !== surname) modifiedFields.surname = surname
+            if(email && user.email !== email) modifiedFields.email = email
+            if(password && user.password !== password) modifiedFields.password = password
+            if(phoneNumber && user.phoneNumber !== phoneNumber) modifiedFields.phoneNumber = phoneNumber
+            if(address && user.address !== address) modifiedFields.address = address
             await UserModel.updateOne({_id: user._id}, {$set: modifiedFields})
-            return 0
+            return 1
         }
         catch (e) {
             throw new Error('Error updating user data')
