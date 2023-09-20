@@ -4,6 +4,8 @@ import {currencyTypes} from "../Constants/CurrencyTypes";
 import moment from "moment";
 import {repeatsEveryTypes} from "../Constants/RepeatsEveryTypes";
 
+type NullableNumber = number | null;
+
 const transactionUpdateSchema = new Schema({
     updatedAt: {type: Number, default: +moment(), required: true}, // will have the value of request time
     repetitionTimeChangedFrom: {type: Number},
@@ -26,7 +28,7 @@ export interface Transaction extends Document {
     createdAt: number;
     updatedAt: typeof transactionUpdateSchema[];
     isRepeating: boolean;
-    repeatsEvery: { interval: number, unit: repeatsEveryTypes };
+    repeatsEvery: { interval: NullableNumber, unit: repeatsEveryTypes };
 }
 
 const transactionSchema = new Schema<Transaction>({
@@ -34,11 +36,11 @@ const transactionSchema = new Schema<Transaction>({
     amount: { type: Number, required: true },
     currency: { type: Number, required: true, enum: currencyTypes },
     date: { type: Number, required: true, default: +moment() }, // so that all transactions dates are the current time
-    sender: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
-    receiver: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
-    sourceAccount: { type: String, ref: 'BankAccount', field: "accountNumber", required: true },
-    destinationAccount: { type: String, ref: 'BankAccount', field: "accountNumber", required: true },
-    title: { type: String, required: true },
+    sender: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    receiver: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    sourceAccount: { type: String, ref: 'BankAccount', field: "accountNumber"},
+    destinationAccount: { type: String, ref: 'BankAccount', field: "accountNumber"},
+    title: { type: String },
     description: { type: String },
     createdAt: { type: Number, required: true, default: +moment() }, // useful when transaction is supposed to be in the future
     updatedAt: [transactionUpdateSchema], // useful for keeping track of transaction updates

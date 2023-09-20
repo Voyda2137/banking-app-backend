@@ -27,12 +27,6 @@ userRouter.post('/login', loginUserValidator, async (req: Request, res: Response
         if (response) {
             return res.status(200).json({ success: true, token: response.token }); // not optimal
         }
-        // res.cookie('jwt', response.token, {
-        //     httpOnly: true,
-        //     sameSite: 'none',
-        //     maxAge: 3600 * 1000,
-        //     // secure: true
-        // });
     }
     catch (e) {
         next(e)
@@ -92,20 +86,6 @@ userRouter.get('/user', passport.authenticate('jwt', { session: false }), async 
         else {
             throw new Error('User not found')
         }
-
-        // res.cookie('userId', response._id.toString(), {
-        //     httpOnly: true,
-        //     maxAge: 3600 * 24 * 7, // valid for a week
-        //     secure: true
-        // });
-        //
-        // res.cookie('accountIds', JSON.stringify(response.bankAccounts), {
-        //     httpOnly: true,
-        //     maxAge: 3600 * 24 * 7, // valid for a week
-        //     secure: true
-        // });
-
-
     } catch (e) {
         next(e)
     }
