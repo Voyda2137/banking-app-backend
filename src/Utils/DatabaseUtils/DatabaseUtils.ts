@@ -192,19 +192,42 @@ export const checkIfAccountBelongsToUser = async ({userId, bankAccNumber}: {user
 
 // transaction
 
-export const createTransaction = async (transactionData: {
-    transactionType: transactionTypes;
-    amount: number;
-    receiver: string;
-    sourceAccount: string;
-    sender: string;
-    description: string;
-    currency: currencyTypes;
-    title: string;
-    destinationAccount: string,
-    isRepeating: boolean
-})=> {
+export const createTransaction = async (transactionData: Partial<Transaction>)=> {
     try {
+        switch(transactionData.transactionType){
+            case transactionTypes.TRANSFER:
+                if(transactionData.sourceAccount && transactionData.amount){
+                    const senderAcc = await getAccByNumber(transactionData.sourceAccount.toString())
+                    if(senderAcc){
+                        if(senderAcc?.balance < transactionData.amount) return 0
+                    }
+                    await BankAccountModel.findOneAndUpdate(
+                        {accountNumber: transactionData.sourceAccount},
+                        {$inc: {balance: -transactionData.amount}}
+                    )
+                    await BankAccountModel.findOneAndUpdate(
+                        {accountNumber: transactionData.destinationAccount},
+                        {$inc: {balance: transactionData.amount}}
+                    )
+                }
+                break
+            case transactionTypes.DEPOSIT:
+                if(transactionData.sourceAccount && transactionData.amount){
+                    await BankAccountModel.findOneAndUpdate(
+                        {accountNumber: transactionData.sourceAccount},
+                        {$inc: {balance: transactionData.amount}}
+                    )
+                }
+                break
+            case transactionTypes.WITHDRAWAL:
+                if(transactionData.sourceAccount && transactionData.amount) {
+                    await BankAccountModel.findOneAndUpdate(
+                        {accountNumber: transactionData.sourceAccount},
+                        {$inc: {balance: -transactionData.amount}}
+                    )
+                }
+                break
+        }
         const newTransaction = new TransactionModel(transactionData)
         return await newTransaction.save()
     }
@@ -222,7 +245,7 @@ export const getTransactionsForUser = async (userId: string) => {
         const transactions: Transaction[] = await TransactionModel.find({
             $or: [
                 {sender: userId},
-                {destinationAccount: userId}
+                {receiver: userId}
             ]
         }).exec()
         if(!transactions) return 1
