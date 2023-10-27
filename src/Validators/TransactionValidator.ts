@@ -11,7 +11,8 @@ const createTransactionFields: string[] = [
     'title',
     'date',
     'isRepeating',
-    'repeatsEvery'
+    'repeatsEvery',
+    'receiverInfo'
 ]
 export const createTransactionValidator = [
     body().custom( val => checkForUnwantedProperties(val, createTransactionFields)),
@@ -47,5 +48,8 @@ export const createTransactionValidator = [
     body('repeatsEvery')
         .optional()
         .isObject()
-        .withMessage('repeatsEvery must be an object')
+        .withMessage('repeatsEvery must be an object'),
+    body('receiverInfo')
+        .notEmpty()
+        .withMessage('receiverInfo cannot be empty')
 ]
