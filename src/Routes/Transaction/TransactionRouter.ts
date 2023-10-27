@@ -49,7 +49,9 @@ transactionRouter.post('/create', createTransactionValidator, passport.authentic
                     amount: req.body.amount,
                     currency: req.body.currency,
                     sender: user._id.toString(),
+                    senderInfo: user.name + " " + user.surname,
                     receiver: receiverAccount._id.toString(),
+                    receiverInfo: req.body.receiverInfo,
                     date: +moment(),
                     sourceAccount: req.body.sourceAccount,
                     destinationAccount: req.body.destinationAccount,
@@ -73,15 +75,24 @@ transactionRouter.post('/create', createTransactionValidator, passport.authentic
                 transaction = transferTransaction
                 break
             case transactionTypes.DEPOSIT:
-            case transactionTypes.WITHDRAWAL:
-                let depositOrWithdrawalTransaction = {
+                let depositTransaction = {
                     transactionType: transactionTypes.DEPOSIT,
                     amount: req.body.amount,
                     currency: req.body.currency,
                     sender: user._id.toString(),
                     sourceAccount: req.body.sourceAccount,
                 }
-                transaction = depositOrWithdrawalTransaction
+                transaction = depositTransaction
+                break
+            case transactionTypes.WITHDRAWAL:
+                let withdrawalTransaction = {
+                    transactionType: transactionTypes.WITHDRAWAL,
+                    amount: req.body.amount,
+                    currency: req.body.currency,
+                    sender: user._id.toString(),
+                    sourceAccount: req.body.sourceAccount,
+                }
+                transaction = withdrawalTransaction
                 break
         }
         if(transaction){

@@ -20,7 +20,9 @@ export interface Transaction extends Document {
     currency: currencyTypes;
     date: number;
     sender: {type: mongoose.Schema.Types.ObjectId, ref: "User"};
+    senderInfo: string
     receiver: {type: mongoose.Schema.Types.ObjectId, ref: "User"};
+    receiverInfo: string;
     sourceAccount: {type: string, ref: "BankAccount", field: "accountNumber"};
     destinationAccount: {type: string, ref: "BankAccount", field: "accountNumber"};
     title: string;
@@ -37,7 +39,9 @@ const transactionSchema = new Schema<Transaction>({
     currency: { type: Number, required: true, enum: currencyTypes },
     date: { type: Number, required: true, default: +moment() }, // so that all transactions dates are the current time
     sender: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    senderInfo: {type: String},
     receiver: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    receiverInfo: {type: String},
     sourceAccount: { type: String, ref: 'BankAccount', field: "accountNumber"},
     destinationAccount: { type: String, ref: 'BankAccount', field: "accountNumber"},
     title: { type: String },
