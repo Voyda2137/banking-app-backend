@@ -1,4 +1,4 @@
-import {body, check} from 'express-validator'
+import {body} from 'express-validator'
 import moment from "moment"
 import {checkForUnwantedProperties} from "./Validators";
 
@@ -16,16 +16,6 @@ const doesNotContainWhiteSpaces = (value: string) => {
     return true;
 };
 const registerValidFields : string[] = ['name', 'surname', 'email', 'address', 'phoneNumber', 'login', 'password', 'birthDate']
-
-const checkParamLength = (param: string, start: number, end: number): boolean => {
-    if(end){
-        return param.length >= start && param.length <= end;
-    }
-    else {
-        return param.length === start
-    }
-}
-
 export const registerUserValidator = [
     body().custom( val => checkForUnwantedProperties(val, registerValidFields)),
     body('name')
@@ -114,12 +104,7 @@ export const editUserValidator = [
         .withMessage('Name must not contain numbers or special characters'),
     body('surname')
         .optional()
-        .custom((value, { req }) => {
-            if (check('password').exists()) {
-                checkParamLength(req.body.password, 3, 20) //TODO zrobic tak wszystkie walidacje
-            }
-            return true;
-        })
+        .isLength({min: 3, max: 20})
         .withMessage('Surname must be between 3 and 20 characters')
         .isAlpha()
         .withMessage('Surname must not contain numbers or special characters'),
