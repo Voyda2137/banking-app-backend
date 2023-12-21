@@ -8,4 +8,8 @@ export const generateToken = (user: User): string => {
     const secretOrPrivateKey: Secret = process.env.AUTHORIZER_SECRET as Secret;
     return jwt.sign({ login: user.login }, secretOrPrivateKey, { expiresIn: '1h' });
 }
+export const generateRefreshToken = (user: User): string => {
+    const secretOrPrivateKey: Secret = process.env.AUTHORIZER_SECRET as Secret;
+    return jwt.sign({ login: user.login }, secretOrPrivateKey, { expiresIn: '90d' });
+}
 

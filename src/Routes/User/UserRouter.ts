@@ -11,7 +11,7 @@ import {
     registerUserValidator
 } from "../../Validators/UserValidator";
 import {validationResult} from "express-validator"
-import {generateToken} from "../../Utils/UserUtils/JWTgenerator";
+import {generateRefreshToken, generateToken} from "../../Utils/UserUtils/JWTgenerator";
 
 const userRouter = Router()
 
@@ -132,7 +132,7 @@ userRouter.post('/refreshToken', passport.authenticate('jwt', { session: false }
 
         const response = await getUserFromJwt(authHeader)
         if(response){
-            const newAccessToken = generateToken(response);
+            const newAccessToken = generateRefreshToken(response);
             return res.status(200).json({ success: true, token: newAccessToken });
         }
     }

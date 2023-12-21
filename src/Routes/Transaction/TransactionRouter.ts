@@ -119,7 +119,7 @@ transactionRouter.get('/transactions', passport.authenticate('jwt', { session: f
                 return res.status(200).json({success: true, message: 'User has no transactions'})
             }
             else {
-                return res.status(200).json({success: true, message: 'Successfully retrieved user transactions', transactions: [val]})
+                return res.status(200).json({success: true, message: 'Successfully retrieved user transactions', transactions: val})
             }
         })
     }
