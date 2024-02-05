@@ -65,9 +65,8 @@ transactionRouter.post('/create', createTransactionValidator, passport.authentic
                 }
                 if(req.body.description) transferTransaction.description = req.body.description
                 if(req.body.date) transferTransaction.date = req.body.date
-                if(req.body.isRepeating) {
+                if(req.body.isRepeating === true) {
                     transferTransaction.isRepeating = req.body.isRepeating
-                    if(!req.body.repeatsEvery.interval || !req.body.repeatsEvery.unit) throw new Error('repeatsEvery cannot be null')
                     transferTransaction.repeatsEvery.interval = req.body.repeatsEvery.interval
                     transferTransaction.repeatsEvery.unit = req.body.repeatsEvery.unit
                 }
