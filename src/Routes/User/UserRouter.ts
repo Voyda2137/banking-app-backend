@@ -18,6 +18,8 @@ const userRouter = Router()
 userRouter.post('/login', loginUserValidator, async (req: Request, res: Response, next: NextFunction) => {
     console.log('Check Date() ', new Date().toUTCString())
     console.log('Check moment', moment.utc().format())
+    console.log('Check +moment', +moment())
+    console.log('Check +moment.utc', +moment.utc())
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
