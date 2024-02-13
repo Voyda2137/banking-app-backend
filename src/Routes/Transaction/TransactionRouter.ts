@@ -37,13 +37,13 @@ transactionRouter.post('/create', createTransactionValidator, passport.authentic
         if(!accBelongsToUser){
             throw new Error('Incorrect account')
         }
-        const receiverAccount = await getAccByNumber(req.body.destinationAccount)
-        if(!receiverAccount) {
-            throw new Error('Could not get the account')
-        }
         let transaction: Partial<Transaction> | undefined
         switch(req.body.transactionType){
             case transactionTypes.TRANSFER:
+                const receiverAccount = await getAccByNumber(req.body.destinationAccount)
+                if(!receiverAccount) {
+                    throw new Error('Could not get the account')
+                }
                 const transferTransaction = {
                     transactionType: transactionTypes.TRANSFER,
                     amount: req.body.amount,
@@ -53,6 +53,7 @@ transactionRouter.post('/create', createTransactionValidator, passport.authentic
                     receiver: receiverAccount._id.toString(),
                     receiverInfo: req.body.receiverInfo,
                     date: +moment(),
+                    createdAt: +moment(),
                     sourceAccount: req.body.sourceAccount,
                     destinationAccount: req.body.destinationAccount,
                     title: req.body.title,
@@ -78,6 +79,8 @@ transactionRouter.post('/create', createTransactionValidator, passport.authentic
                     transactionType: transactionTypes.DEPOSIT,
                     amount: req.body.amount,
                     currency: req.body.currency,
+                    date: +moment(),
+                    createdAt: +moment(),
                     sender: user._id.toString(),
                     sourceAccount: req.body.sourceAccount,
                 }
@@ -88,6 +91,8 @@ transactionRouter.post('/create', createTransactionValidator, passport.authentic
                     transactionType: transactionTypes.WITHDRAWAL,
                     amount: req.body.amount,
                     currency: req.body.currency,
+                    date: +moment(),
+                    createdAt: +moment(),
                     sender: user._id.toString(),
                     sourceAccount: req.body.sourceAccount,
                 }
