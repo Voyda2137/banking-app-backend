@@ -9,6 +9,7 @@ import {bankAccountStatusTypes} from "../../Constants/BankAccountStatusCodes";
 import {transactionTypes} from "../../Constants/TransactionTypes";
 import {currencyTypes} from "../../Constants/CurrencyTypes";
 import {extractLoginFromJwt, getUserFromJwt} from "../UserUtils/GeneralUtils";
+import {languages} from "../../Constants/Languages";
 
 const bcrypt = require('bcrypt')
 
@@ -119,6 +120,15 @@ export const changeUserToService = async ({token, login}: {token: string, login:
     }
     return 0
 }
+export const changeSettings = async ({userId, locale, mainAccount}: {userId: string, locale?: languages, mainAccount?: string}) => {
+    const user = await getUserById(userId)
+    if(!locale && !mainAccount) return null
+    return UserModel.updateOne({_id: userId}, {
+        settings: {
+            locale: locale ? locale : user?.settings.locale,
+            mainAccount: mainAccount ? mainAccount : user?.settings.mainAccount
+        }})
+}
 // bank account
 
 export const createBankAccount = async (accountData: BankAccount) : Promise<BankAccount | null> => {
@@ -184,12 +194,10 @@ export const checkIfAccountBelongsToUser = async ({userId, bankAccNumber}: {user
     const user = await getUserById(userId.toString())
     const accId = await getAccByNumber(bankAccNumber)
     const userHasAcc =  user?.bankAccounts.some(acc => {
-        console.log('konto', acc.toString())
         return acc.toString() === accId?._id.toString()
     })
     return !!userHasAcc;
 }
-
 // transaction
 
 export const createTransaction = async (transactionData: Partial<Transaction>)=> {
