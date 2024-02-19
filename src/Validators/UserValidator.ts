@@ -1,6 +1,7 @@
 import {body} from 'express-validator'
 import moment from "moment"
 import {checkForUnwantedProperties} from "./Validators";
+import {languages} from "../Constants/Languages";
 
 const isOldEnough = (value: number) => {
     if (moment(value).isBefore(moment().subtract(18, 'years'))) {
@@ -131,4 +132,23 @@ export const changeUserToServiceValidator = [
     body('login')
         .notEmpty()
         .withMessage('Login cannot be empty')
+]
+
+const changeSettingsFields: string[] = ['locale', 'mainAccount']
+export const changeSettingsValidator = [
+    body().custom( val => checkForUnwantedProperties(val, changeSettingsFields)),
+    body('locale')
+        .optional()
+        .isString()
+        .withMessage('Locale must be string')
+        .custom(locale => {
+            return Object.values(languages).includes(locale)
+        })
+        .withMessage('Unrecognized language')
+        .isLength({min: 2, max: 3})
+        .withMessage('Must be 2 or 3 characters long'),
+    body('mainAccount')
+        .optional()
+        .isString()
+        .withMessage('mainAccount must be string')
 ]

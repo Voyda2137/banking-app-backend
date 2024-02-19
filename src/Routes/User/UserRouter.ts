@@ -1,10 +1,11 @@
 import {Router, Request, Response, NextFunction} from "express";
 import {authenticateUser} from "../../Utils/UserUtils/Authenticator";
-import {changeUserToService, createUser, editUser} from "../../Utils/DatabaseUtils/DatabaseUtils";
+import {changeSettings, changeUserToService, createUser, editUser} from "../../Utils/DatabaseUtils/DatabaseUtils";
 import passport from "../../Utils/UserUtils/Authorizer";
 import {getUserFromJwt} from "../../Utils/UserUtils/GeneralUtils";
 import moment from "moment";
 import {
+    changeSettingsValidator,
     changeUserToServiceValidator,
     editUserValidator,
     loginUserValidator,
@@ -116,7 +117,7 @@ userRouter.put('/addService', changeUserToServiceValidator, passport.authenticat
             return res.status(400).json({ success: false, errors: errors.array() });
         }
         const authHeader: string | undefined = req.header('Authorization')
-        if(authHeader){
+        if (authHeader){
             const createdService = await changeUserToService({token: authHeader, login: req.body.login})
             if(createdService) return res.status(200).json({success: true, message: 'Successfully changed user to service'})
             else throw new Error('Cannot change user to service')
@@ -131,7 +132,7 @@ userRouter.post('/refreshToken', passport.authenticate('jwt', { session: false }
         const authHeader: string | undefined = req.header('Authorization')
 
         const response = await getUserFromJwt(authHeader)
-        if(response){
+        if (response){
             const newAccessToken = generateRefreshToken(response);
             return res.status(200).json({ success: true, token: newAccessToken });
         }
@@ -140,4 +141,20 @@ userRouter.post('/refreshToken', passport.authenticate('jwt', { session: false }
         next(e)
     }
 });
+userRouter.put('/settings', changeSettingsValidator, passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
+        }
+        const authHeader: string | undefined = req.header('Authorization')
+        const user = await getUserFromJwt(authHeader)
+        const response = await changeSettings({userId: user?._id, locale: req.body?.locale, mainAccount: req.body?.mainAccount})
+        if (!response) throw new Error('locale or mainAccount must be passed')
+        return res.status(200).json({success: true, message: 'Successfully changed the settings'})
+    }
+    catch (e) {
+        next(e)
+    }
+})
 export default userRouter

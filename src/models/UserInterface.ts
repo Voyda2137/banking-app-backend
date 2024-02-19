@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import {BankAccount} from "./AccountInterface";
+import {languages} from "../Constants/Languages";
 
 export interface User extends Document {
     userId: string;
@@ -15,6 +16,10 @@ export interface User extends Document {
     birthDate: number;
     createdAt: number;
     isService: boolean;
+    settings: {
+        locale: languages;
+        mainAccount: [{type: mongoose.Schema.Types.ObjectId, ref: "BankAccount"}];
+    }
 }
 
 const userSchema = new Schema<User>({
@@ -30,7 +35,11 @@ const userSchema = new Schema<User>({
     transactions: [{ type: mongoose.Schema.Types.ObjectId, default: [], ref: 'Transaction' }],
     birthDate: {type: Number, required: true},
     createdAt: {type: Number},
-    isService: {type: Boolean}
+    isService: {type: Boolean},
+    settings: {
+        locale: {type: String, enum: languages },
+        mainAccount: { type: mongoose.Schema.Types.ObjectId, ref: 'BankAccount' }
+    }
 });
 
 export const UserModel = mongoose.model<User>("users", userSchema);
