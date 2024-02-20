@@ -75,7 +75,8 @@ userRouter.get('/user', passport.authenticate('jwt', { session: false }), async 
                 phoneNumber: response.phoneNumber,
                 birthDate: response.birthDate,
                 createdAt: response.createdAt,
-                isService: response.isService
+                isService: response.isService,
+                settings: response.settings
             };
 
             return res.status(200).json({
