@@ -10,7 +10,8 @@
     "build": "npx tsc --declaration",
     "start": "node ./dist/app.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q app.ts\"",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "npm run build",
+    "test": "architest"
   },
   "repository": {
     "type": "git",
@@ -40,6 +41,7 @@
     "ts-node": "^10.9.1"
   },
   "devDependencies": {
+    "@archikoder/architest": "^0.5.23",
     "@types/bcrypt": "^5.0.0",
     "@types/body-parser": "^1.19.2",
     "@types/cookie": "^0.5.1",

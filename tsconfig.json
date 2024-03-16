@@ -9,5 +9,8 @@
     "types": []
   },
   "include": ["src/**/*", "src"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
+  "architest": {
+    "root": "./test"
+  }
 }

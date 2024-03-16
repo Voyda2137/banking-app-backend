@@ -13,8 +13,8 @@ interface AuthenticatedUser extends User {
  * @param password
  * @returns code: 1 - user not found, 2 - invalid password, 3 - success
  */
-export const authenticateUser = async ({ login, password }: { login: string, password: string }): Promise<AuthenticatedUser | null> => {
-    const user = await UserModel.findOne({ login });
+export const authenticateUser = async ({ login, password }: { login: string, password: string }, _UserModel?: {findOne: Function}): Promise<AuthenticatedUser | null> => {
+    const user = await (_UserModel || UserModel).findOne({ login });
 
     if (!user) {
         throw new Error('User not found');
