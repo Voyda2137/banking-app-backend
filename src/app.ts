@@ -4,6 +4,7 @@ import userRouter from "./Routes/User/UserRouter";
 import passport from "./Utils/UserUtils/Authorizer";
 import BankAccountRouter from "./Routes/BankAccount/BankAccountRouter";
 import transactionRouter from "./Routes/Transaction/TransactionRouter";
+import messageRouter from "./Routes/Messages/MessageRouter";
 
 const app: Express = express()
 const port = process.env.PORT
@@ -38,6 +39,7 @@ app.use(cors({credentials: true, origin: ['http://localhost:2137', 'https://mg-b
 app.use('/user', userRouter)
 app.use('/accounts', BankAccountRouter)
 app.use('/transactions', transactionRouter)
+app.use('/messages', messageRouter)
 
 app.use(errorHandler)
 
