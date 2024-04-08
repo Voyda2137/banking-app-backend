@@ -255,7 +255,7 @@ export const getTransactionsForUser = async (userId: string) => {
                 {sender: userId},
                 {receiver: userId}
             ]
-        }).exec()
+        }).sort({_id: -1}).exec()
         if(!transactions) return 1
         else return transactions
 
