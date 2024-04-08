@@ -9,7 +9,7 @@
   "scripts": {
     "build": "npx tsc --declaration",
     "start": "node ./dist/app.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q app.ts\"",
+    "dev": "nodemon ./src/app.ts",
     "heroku-postbuild": "npm run build"
   },
   "repository": {
