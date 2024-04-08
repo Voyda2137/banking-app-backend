@@ -11,7 +11,7 @@ const messageRouter = Router();
 
 messageRouter.get('/', passport.authenticate('jwt', {session: false}), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const messages = await MessagesModel.find();
+        const messages = await MessagesModel.find().sort({_id: -1});
 
         res.status(200).json({success: true, message: "Successfully getted messages", messages: messages})
     } catch (e) {
