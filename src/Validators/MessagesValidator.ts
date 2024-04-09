@@ -21,11 +21,14 @@ export const editMessageValidator = [
     body().custom( val => checkForUnwantedProperties(val, createNewMessageFields)),
     body('message')
         .isString()
-        .withMessage("Message must be a string."),
+        .withMessage("Message must be a string.")
+        .optional(),
     body("title")
         .isString()
-        .withMessage("Title must be a string."),
+        .withMessage("Title must be a string.")
+        .optional(),
     body("icon")
         .isString()
         .withMessage("Icon must be a string (fontawesome class).")
+        .optional()
 ]
