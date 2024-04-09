@@ -198,6 +198,21 @@ export const checkIfAccountBelongsToUser = async ({userId, bankAccNumber}: {user
     })
     return !!userHasAcc;
 }
+export const getAccountById = async (accountId: string) => {
+    try {
+        const account: BankAccount | null = await BankAccountModel.findById(accountId).exec()
+        if(account) return account
+        else return null
+    }
+    catch (e) {
+        if (e instanceof mongoose.Error.ValidationError) {
+            throw new Error('Could not get account: ' + e.errors);
+        }
+        else {
+            throw new Error('Could not get account: ' + e);
+        }
+    }
+}
 // transaction
 
 export const createTransaction = async (transactionData: Partial<Transaction>)=> {
@@ -269,3 +284,26 @@ export const getTransactionsForUser = async (userId: string) => {
         }
     }
 }
+export const getTransactionsForAccount = async (accountId: string) => {
+    try {
+        const account = await getAccountById(accountId);
+
+        const transactions: Transaction[] = await TransactionModel.find({
+            $or: [
+                {sourceAccount: account?.accountNumber},
+                {destinationAccount: account?.accountNumber}
+            ]
+        }).sort({_id: -1}).exec()
+        if(!transactions) return 1
+        else return transactions
+    }
+    catch (e) {
+        if (e instanceof mongoose.Error.ValidationError) {
+            throw new Error('Could not get account transactions: ' + e.errors);
+        }
+        else {
+            throw new Error('Could not get account transactions: ' + e);
+        }
+    }
+}
+
