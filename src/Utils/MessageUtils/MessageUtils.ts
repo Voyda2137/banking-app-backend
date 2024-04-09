@@ -16,3 +16,34 @@ export const createMessage = async (messageData: Partial<Messages>) => {
         return null;
     }
 }
+
+export const getMessageById = async (id: string) => {
+    try {
+        return await MessagesModel.findById(id);
+    } catch (e) {
+        console.error(e)
+        return null;
+    }
+}
+
+export const deleteMessage = async (id: string) => {
+    try {
+        return await MessagesModel.findByIdAndDelete(id);
+    } catch (e) {
+        console.error(e)
+        return null;
+    }
+}
+
+export const editMessage = async (id: string, messageData: Partial<Messages>) => {
+    try {
+        const tmp = {
+            ...messageData,
+            updatedAt: +moment()
+        }
+        return await MessagesModel.findByIdAndUpdate(id, tmp, {new: true});
+    } catch (e) {
+        console.error(e)
+        return null;
+    }
+}

@@ -33,7 +33,7 @@ const errorHandler =  (err: Error, req: Request, res: Response, next: NextFuncti
 // app.use(httpsEnforcer)
 app.use(express.json())
 app.use(passport.initialize())
-app.use(cors({credentials: true, origin: ['http://localhost:2137', 'https://mg-banking.pl', 'https://dev.mg-banking.pl']}));
+app.use(cors({credentials: true, origin: ['http://localhost:2137', "http://localhost:2147", 'https://mg-banking.pl', 'https://dev.mg-banking.pl']}));
 // app.use(enforce.HTTPS({trustProtoHeader: true}))
 
 app.use('/user', userRouter)
