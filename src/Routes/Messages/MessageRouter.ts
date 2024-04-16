@@ -5,7 +5,6 @@ import {createNewMessageValidator, editMessageValidator} from "../../Validators/
 import {validationResult} from "express-validator";
 import {getUserFromJwt} from "../../Utils/UserUtils/GeneralUtils";
 import {createMessage, deleteMessage, editMessage, getMessageById} from "../../Utils/MessageUtils/MessageUtils";
-import moment from "moment";
 
 const messageRouter = Router();
 
@@ -23,6 +22,9 @@ messageRouter.get('/', passport.authenticate('jwt', {session: false}), async (re
 messageRouter.get('/:id', passport.authenticate('jwt', {session: false}), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const message = await getMessageById(req.params.id);
+        if (!message) {
+            return res.status(404).json({success: false, message: "Message not found"})
+        }
 
         res.status(200).json({success: true, message: "Successfully getted message", messages: message})
     } catch (e) {

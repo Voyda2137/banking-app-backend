@@ -144,6 +144,11 @@ transactionRouter.get('/transactions/:id', passport.authenticate('jwt', {session
         if (!user) {
             throw new Error('Could not verify user')
         }
+
+        if (!req.params.id) {
+            throw new Error('No account id provided')
+        }
+
         getTransactionsForAccount(req.params.id).then(val => {
             if (val === 1) {
                 return res.status(200).json({success: true, message: 'Account has no transactions'})
