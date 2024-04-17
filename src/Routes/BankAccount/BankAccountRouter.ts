@@ -2,12 +2,12 @@ import {NextFunction, Request, Response, Router} from "express";
 import {
     addAccountToUser,
     createBankAccount,
-    getAccountAndDelete,
+    getAccountAndDelete, getAccountAndUpdateStatus,
     getUserAccounts
 } from "../../Utils/DatabaseUtils/DatabaseUtils";
 import passport from "../../Utils/UserUtils/Authorizer"
 import {getUserFromJwt} from "../../Utils/UserUtils/GeneralUtils";
-import {createBankAccountValidator} from "../../Validators/AccountValidator";
+import {createBankAccountValidator, editStatusBankAccountValidator} from "../../Validators/AccountValidator";
 import {validationResult} from "express-validator";
 
 const bankAccountRouter = Router()
@@ -107,6 +107,35 @@ bankAccountRouter.delete('/account/:id', passport.authenticate('jwt', {session: 
                 res.status(200).json({
                     success: true,
                     message: 'Successfully deleted account',
+                    account: response
+                })
+            } else {
+                res.status(404).json({
+                    success: false,
+                    message: 'Account not found'
+                })
+            }
+        })
+    } catch (e) {
+        next(e)
+    }
+})
+
+bankAccountRouter.put('/account/:id', editStatusBankAccountValidator, passport.authenticate('jwt', {session: false}), async (req: Request, res: Response, next: NextFunction) => {
+    const {params, body} = req
+    try {
+        const authHeader: string | undefined = req.header('Authorization')
+
+        const user = await getUserFromJwt(authHeader)
+        if (!user) {
+            throw new Error('Could not verify user')
+        }
+
+        getAccountAndUpdateStatus({accountId: params.id, status: body.status}).then(response => {
+            if (response) {
+                res.status(200).json({
+                    success: true,
+                    message: 'Successfully updated account status',
                     account: response
                 })
             } else {

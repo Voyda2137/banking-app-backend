@@ -10,6 +10,7 @@ import {transactionTypes} from "../../Constants/TransactionTypes";
 import {currencyTypes} from "../../Constants/CurrencyTypes";
 import {extractLoginFromJwt, getUserFromJwt} from "../UserUtils/GeneralUtils";
 import {languages} from "../../Constants/Languages";
+import {AccountUpdate} from "../../models/types";
 
 const bcrypt = require('bcrypt')
 
@@ -216,6 +217,23 @@ export const getAccountById = async (accountId: string) => {
 export const getAccountAndDelete = async (accountId: string) => {
     try {
         return await BankAccountModel.findByIdAndDelete(accountId).exec();
+    } catch (e) {
+        if (e instanceof mongoose.Error.ValidationError) {
+            throw new Error('Could not get account: ' + e.errors);
+        } else {
+            throw new Error('Could not get account: ' + e);
+        }
+    }
+}
+
+
+export const getAccountAndUpdateStatus = async ({accountId, status}: AccountUpdate) => {
+    try {
+        const tmp = {
+            status: status,
+            updatedAt: +moment()
+        }
+        return await BankAccountModel.findOneAndUpdate({_id: accountId}, tmp).exec();
     } catch (e) {
         if (e instanceof mongoose.Error.ValidationError) {
             throw new Error('Could not get account: ' + e.errors);
