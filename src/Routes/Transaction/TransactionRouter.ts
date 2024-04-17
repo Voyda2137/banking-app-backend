@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response, Router} from "express";
 import passport from "../../Utils/UserUtils/Authorizer";
 import {
-    checkIfAccountBelongsToUser,
+    checkIfAccountBelongsToUser, checkIfAccountIsActive,
     createTransaction,
     getAccByNumber,
     getTransactionsForAccount,
@@ -34,6 +34,12 @@ transactionRouter.post('/create', createTransactionValidator, passport.authentic
         if (req.body.amount <= 0) {
             throw new Error('Amount must be bigger than 0')
         }
+        const checkIfSourceAccountIsActive = await checkIfAccountIsActive(req.body.sourceAccount)
+
+        if (!checkIfSourceAccountIsActive) {
+            throw new Error('Account is not active')
+        }
+
         const accBelongsToUser = await checkIfAccountBelongsToUser({
             userId: user._id.toString(),
             bankAccNumber: req.body.sourceAccount
