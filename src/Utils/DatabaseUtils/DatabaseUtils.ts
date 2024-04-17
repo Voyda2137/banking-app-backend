@@ -191,6 +191,10 @@ export const addAccountToUser = async ({userId, bankAccId}: { userId: string, ba
         return null
     }
 }
+export const checkIfAccountIsActive = async (bankAccNumber: string) => {
+    const account = await getAccByNumber(bankAccNumber)
+    return account?.status === bankAccountStatusTypes.ACTIVE
+}
 export const checkIfAccountBelongsToUser = async ({userId, bankAccNumber}: {userId: string, bankAccNumber: string}) => {
     const user = await getUserById(userId.toString())
     const accId = await getAccByNumber(bankAccNumber)
