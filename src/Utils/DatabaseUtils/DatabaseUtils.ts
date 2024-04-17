@@ -213,6 +213,17 @@ export const getAccountById = async (accountId: string) => {
         }
     }
 }
+export const getAccountAndDelete = async (accountId: string) => {
+    try {
+        return await BankAccountModel.findByIdAndDelete(accountId).exec();
+    } catch (e) {
+        if (e instanceof mongoose.Error.ValidationError) {
+            throw new Error('Could not get account: ' + e.errors);
+        } else {
+            throw new Error('Could not get account: ' + e);
+        }
+    }
+}
 // transaction
 
 export const createTransaction = async (transactionData: Partial<Transaction>)=> {
