@@ -46,5 +46,5 @@ app.use(errorHandler)
 connectToMongo()
 
 app.listen(port, () => {
-    console.log(`xdd`);
+    console.log(`xdd, port: ${port}`);
 });
