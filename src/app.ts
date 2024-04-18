@@ -5,6 +5,8 @@ import passport from "./Utils/UserUtils/Authorizer";
 import BankAccountRouter from "./Routes/BankAccount/BankAccountRouter";
 import transactionRouter from "./Routes/Transaction/TransactionRouter";
 import messageRouter from "./Routes/Messages/MessageRouter";
+import analysisRouter from "./Routes/Analysis/AnalysisRouter";
+import currencyRouter from "./Routes/Currency/CurrencyRouter";
 
 const app: Express = express()
 const port = process.env.PORT
@@ -40,6 +42,7 @@ app.use('/user', userRouter)
 app.use('/accounts', BankAccountRouter)
 app.use('/transactions', transactionRouter)
 app.use('/messages', messageRouter)
+app.use('/currency', currencyRouter)
 
 app.use(errorHandler)
 

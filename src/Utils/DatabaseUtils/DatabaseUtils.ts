@@ -1,14 +1,13 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import {UserModel, User} from "../../models/UserInterface";
+import {User, UserModel} from "../../models/UserInterface";
 import {BankAccount, BankAccountModel} from "../../models/AccountInterface";
 import {generateBankAccountNumber} from "../AccountUtils/AccountUtils";
 import moment from "moment"
 import {Transaction, TransactionModel} from "../../models/TransactionInterface";
 import {bankAccountStatusTypes} from "../../Constants/BankAccountStatusCodes";
 import {transactionTypes} from "../../Constants/TransactionTypes";
-import {currencyTypes} from "../../Constants/CurrencyTypes";
-import {extractLoginFromJwt, getUserFromJwt} from "../UserUtils/GeneralUtils";
+import {getUserFromJwt} from "../UserUtils/GeneralUtils";
 import {languages} from "../../Constants/Languages";
 import {AccountUpdate} from "../../models/types";
 
@@ -18,29 +17,28 @@ dotenv.config()
 
 export const connectToMongo = () => {
     const connectionString = process.env.MONGO_CONNECTION
-    if(connectionString){
+    if (connectionString) {
         mongoose.connect(connectionString).then(() => {
             console.log('Connected to mongo')
         })
-    }
-    else console.log('Cannot connect to mongo')
+    } else console.log('Cannot connect to mongo')
 }
 // user
 
 export const createUser = async (userData: User): Promise<User | null> => {
-        const { login, email, password } = userData;
-        const newUser = new UserModel(userData);
-        const existingUser = await UserModel.findOne({ $or: [{ login }, { email }] });
+    const {login, email, password} = userData;
+    const newUser = new UserModel(userData);
+    const existingUser = await UserModel.findOne({$or: [{login}, {email}]});
 
-        if (existingUser) {
-            return null
-        }
+    if (existingUser) {
+        return null
+    }
 
-        const saltRounds = 10;
+    const saltRounds = 10;
 
-        newUser.password = await bcrypt.hash(password, saltRounds);
+    newUser.password = await bcrypt.hash(password, saltRounds);
 
-        return await newUser.save();
+    return await newUser.save();
 
 };
 export const getUserByLogin = async (login: string): Promise<User | null> => {
@@ -67,6 +65,14 @@ export const getUserById = async (userId: string): Promise<User | null> => {
         throw new Error('Could not get user: ' + e);
     }
 };
+export const getUserActualAccount = async (userId: string) => {
+    const user = await getUserById(userId);
+    if (user) {
+        const mainAccount = user.settings.mainAccount
+        return await getAccountById(mainAccount.toString())
+    }
+    return null;
+}
 export const editUser = async (
     {
         token,
@@ -87,19 +93,18 @@ export const editUser = async (
     }
 ) => {
     const user = await getUserFromJwt(token)
-    if(user){
-        try{
-            const modifiedFields: {[key: string]: any} = {}
-            if(name && user.name !== name) modifiedFields.name = name
-            if(surname && user.surname !== surname) modifiedFields.surname = surname
-            if(email && user.email !== email) modifiedFields.email = email
-            if(password && user.password !== password) modifiedFields.password = password
-            if(phoneNumber && user.phoneNumber !== phoneNumber) modifiedFields.phoneNumber = phoneNumber
-            if(address && user.address !== address) modifiedFields.address = address
+    if (user) {
+        try {
+            const modifiedFields: { [key: string]: any } = {}
+            if (name && user.name !== name) modifiedFields.name = name
+            if (surname && user.surname !== surname) modifiedFields.surname = surname
+            if (email && user.email !== email) modifiedFields.email = email
+            if (password && user.password !== password) modifiedFields.password = password
+            if (phoneNumber && user.phoneNumber !== phoneNumber) modifiedFields.phoneNumber = phoneNumber
+            if (address && user.address !== address) modifiedFields.address = address
             await UserModel.updateOne({_id: user._id}, {$set: modifiedFields})
             return 1
-        }
-        catch (e) {
+        } catch (e) {
             throw new Error('Error updating user data')
         }
     }
@@ -110,29 +115,34 @@ export const editUser = async (
  * @param login - user to be made a service user
  * @returns if the function was successful returns 1 else returns 0
  */
-export const changeUserToService = async ({token, login}: {token: string, login: string}) => {
+export const changeUserToService = async ({token, login}: { token: string, login: string }) => {
     const serviceUser = await getUserFromJwt(token)
-    if(serviceUser?.isService){
-       const futureService = await getUserByLogin(login)
-        if(futureService){
+    if (serviceUser?.isService) {
+        const futureService = await getUserByLogin(login)
+        if (futureService) {
             await UserModel.updateOne({_id: futureService._id}, {isService: true})
             return 1
         }
     }
     return 0
 }
-export const changeSettings = async ({userId, locale, mainAccount}: {userId: string, locale?: languages, mainAccount?: string}) => {
+export const changeSettings = async ({userId, locale, mainAccount}: {
+    userId: string,
+    locale?: languages,
+    mainAccount?: string
+}) => {
     const user = await getUserById(userId)
-    if(!locale && !mainAccount) return null
+    if (!locale && !mainAccount) return null
     return UserModel.updateOne({_id: userId}, {
         settings: {
             locale: locale ? locale : user?.settings.locale,
             mainAccount: mainAccount ? mainAccount : user?.settings.mainAccount
-        }})
+        }
+    })
 }
 // bank account
 
-export const createBankAccount = async (accountData: BankAccount) : Promise<BankAccount | null> => {
+export const createBankAccount = async (accountData: BankAccount): Promise<BankAccount | null> => {
     try {
         const account = {
             accountNumber: generateBankAccountNumber(),
@@ -145,8 +155,7 @@ export const createBankAccount = async (accountData: BankAccount) : Promise<Bank
         }
         const newBankAccount = new BankAccountModel(account)
         return await newBankAccount.save()
-    }
-    catch (e){
+    } catch (e) {
         console.error('Could not create an account ', e)
         return null
     }
@@ -164,11 +173,11 @@ export const getAccByNumber = async (accNumber: string): Promise<BankAccount | n
     }
 };
 export const getUserAccounts = async (userId: string): Promise<BankAccount[]> => {
-    try{
+    try {
         const user = await UserModel.findById(userId)
         const accounts: BankAccount[] = []
-        if(user){
-            if(user.bankAccounts.length > 0){
+        if (user) {
+            if (user.bankAccounts.length > 0) {
                 for (const acc of user.bankAccounts) {
                     const account = await BankAccountModel.findById(acc);
                     if (account !== null) {
@@ -178,16 +187,14 @@ export const getUserAccounts = async (userId: string): Promise<BankAccount[]> =>
             }
         }
         return accounts
-    }
-    catch (e) {
+    } catch (e) {
         throw new Error('Could not get user accounts')
     }
 }
 export const addAccountToUser = async ({userId, bankAccId}: { userId: string, bankAccId: string }) => {
     try {
         return await UserModel.updateOne({_id: userId}, {$push: {bankAccounts: bankAccId}})
-    }
-    catch(e){
+    } catch (e) {
         return null
     }
 }
@@ -195,10 +202,13 @@ export const checkIfAccountIsActive = async (bankAccNumber: string) => {
     const account = await getAccByNumber(bankAccNumber)
     return account?.status === bankAccountStatusTypes.ACTIVE
 }
-export const checkIfAccountBelongsToUser = async ({userId, bankAccNumber}: {userId: string, bankAccNumber: string}) => {
+export const checkIfAccountBelongsToUser = async ({userId, bankAccNumber}: {
+    userId: string,
+    bankAccNumber: string
+}) => {
     const user = await getUserById(userId.toString())
     const accId = await getAccByNumber(bankAccNumber)
-    const userHasAcc =  user?.bankAccounts.some(acc => {
+    const userHasAcc = user?.bankAccounts.some(acc => {
         return acc.toString() === accId?._id.toString()
     })
     return !!userHasAcc;
@@ -206,14 +216,12 @@ export const checkIfAccountBelongsToUser = async ({userId, bankAccNumber}: {user
 export const getAccountById = async (accountId: string) => {
     try {
         const account: BankAccount | null = await BankAccountModel.findById(accountId).exec()
-        if(account) return account
+        if (account) return account
         else return null
-    }
-    catch (e) {
+    } catch (e) {
         if (e instanceof mongoose.Error.ValidationError) {
             throw new Error('Could not get account: ' + e.errors);
-        }
-        else {
+        } else {
             throw new Error('Could not get account: ' + e);
         }
     }
@@ -248,14 +256,14 @@ export const getAccountAndUpdateStatus = async ({accountId, status}: AccountUpda
 }
 // transaction
 
-export const createTransaction = async (transactionData: Partial<Transaction>)=> {
+export const createTransaction = async (transactionData: Partial<Transaction>) => {
     try {
-        switch(transactionData.transactionType){
+        switch (transactionData.transactionType) {
             case transactionTypes.TRANSFER:
-                if(transactionData.sourceAccount && transactionData.amount){
+                if (transactionData.sourceAccount && transactionData.amount) {
                     const senderAcc = await getAccByNumber(transactionData.sourceAccount.toString())
-                    if(senderAcc){
-                        if(senderAcc?.balance < transactionData.amount) return 0
+                    if (senderAcc) {
+                        if (senderAcc?.balance < transactionData.amount) return 0
                     }
                     await BankAccountModel.findOneAndUpdate(
                         {accountNumber: transactionData.sourceAccount},
@@ -268,7 +276,7 @@ export const createTransaction = async (transactionData: Partial<Transaction>)=>
                 }
                 break
             case transactionTypes.DEPOSIT:
-                if(transactionData.sourceAccount && transactionData.amount){
+                if (transactionData.sourceAccount && transactionData.amount) {
                     await BankAccountModel.findOneAndUpdate(
                         {accountNumber: transactionData.sourceAccount},
                         {$inc: {balance: transactionData.amount}}
@@ -276,7 +284,7 @@ export const createTransaction = async (transactionData: Partial<Transaction>)=>
                 }
                 break
             case transactionTypes.WITHDRAWAL:
-                if(transactionData.sourceAccount && transactionData.amount) {
+                if (transactionData.sourceAccount && transactionData.amount) {
                     await BankAccountModel.findOneAndUpdate(
                         {accountNumber: transactionData.sourceAccount},
                         {$inc: {balance: -transactionData.amount}}
@@ -286,12 +294,10 @@ export const createTransaction = async (transactionData: Partial<Transaction>)=>
         }
         const newTransaction = new TransactionModel(transactionData)
         return await newTransaction.save()
-    }
-    catch (e) {
+    } catch (e) {
         if (e instanceof Error) {
             throw new Error('Could not create a transaction: ' + e.message);
-        }
-        else {
+        } else {
             throw new Error('Could not create a transaction');
         }
     }
@@ -304,15 +310,13 @@ export const getTransactionsForUser = async (userId: string) => {
                 {receiver: userId}
             ]
         }).sort({_id: -1}).exec()
-        if(!transactions) return 1
+        if (!transactions) return 1
         else return transactions
 
-    }
-    catch (e) {
+    } catch (e) {
         if (e instanceof mongoose.Error.ValidationError) {
             throw new Error('Could not get user transactions: ' + e.errors);
-        }
-        else {
+        } else {
             throw new Error('Could not get user transactions: ' + e);
         }
     }
@@ -327,14 +331,12 @@ export const getTransactionsForAccount = async (accountId: string) => {
                 {destinationAccount: account?.accountNumber}
             ]
         }).sort({_id: -1}).exec()
-        if(!transactions) return 1
+        if (!transactions) return 1
         else return transactions
-    }
-    catch (e) {
+    } catch (e) {
         if (e instanceof mongoose.Error.ValidationError) {
             throw new Error('Could not get account transactions: ' + e.errors);
-        }
-        else {
+        } else {
             throw new Error('Could not get account transactions: ' + e);
         }
     }
