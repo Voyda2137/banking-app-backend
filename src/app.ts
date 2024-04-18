@@ -5,7 +5,6 @@ import passport from "./Utils/UserUtils/Authorizer";
 import BankAccountRouter from "./Routes/BankAccount/BankAccountRouter";
 import transactionRouter from "./Routes/Transaction/TransactionRouter";
 import messageRouter from "./Routes/Messages/MessageRouter";
-import analysisRouter from "./Routes/Analysis/AnalysisRouter";
 import currencyRouter from "./Routes/Currency/CurrencyRouter";
 
 const app: Express = express()
