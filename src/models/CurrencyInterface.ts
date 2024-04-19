@@ -1,5 +1,3 @@
-
-
 export interface CurrencyQuote {
     [key: string]: number
 }
@@ -13,4 +11,11 @@ export interface Currency {
 export interface ApiUrlCurrency {
     date: string,
     hour: string
+}
+
+export interface CalculatedExchangeRateChange {
+    currency: string,
+    change: number,
+    oldRate: number,
+    newRate: number
 }

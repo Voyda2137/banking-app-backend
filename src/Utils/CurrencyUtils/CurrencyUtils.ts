@@ -1,7 +1,7 @@
-import {Currency} from "../../models/CurrencyInterface";
+import {CalculatedExchangeRateChange, Currency} from "../../models/CurrencyInterface";
 
 
-export const calculateExchangeRateChangePercentage = (oldExchangeRate: Currency, newExchangeRate: Currency) => {
+export const calculateExchangeRateChangePercentage = (oldExchangeRate: Currency, newExchangeRate: Currency): CalculatedExchangeRateChange[] => {
     const todayQuotes = newExchangeRate.quotes;
     const tomorrowQuotes = oldExchangeRate.quotes;
 
