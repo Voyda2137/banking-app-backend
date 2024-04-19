@@ -8,7 +8,8 @@ import {ApiUrlCurrency} from "../../models/CurrencyInterface";
 
 const currencyRouter = Router();
 
-const API_URL = ({date, hour}: ApiUrlCurrency) => `${process.env.CURRENCY_API_URL}/${date}/${hour}.json`
+
+const API_URL = ({date, hour}: ApiUrlCurrency) => `${process.env.CURRENCY_API_URL || "https://cdn.jsdelivr.net/gh/ismartcoding/currency-api@main"}/${date}/${hour}.json`
 
 currencyRouter.get('/', passport.authenticate('jwt', {session: false}), async (req, res, next) => {
     try {
