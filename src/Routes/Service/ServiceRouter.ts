@@ -3,10 +3,11 @@ import passport from "passport";
 import {getUserFromJwt, isUserService} from "../../Utils/UserUtils/GeneralUtils";
 import {
     getAccountAndUpdateStatus,
-    getAccountById,
-    getTransactionsForUser, getUsers
+    getAccountById, getTransactionsForAccount,
+    getUserAccounts,
+    getUserById,
+    getUsers
 } from "../../Utils/DatabaseUtils/DatabaseUtils";
-import userRouter from "../User/UserRouter";
 
 
 const serviceRouter = Router();
@@ -39,7 +40,7 @@ serviceRouter.get("/transactionLogs/:id", passport.authenticate("jwt", {session:
         if (!user) throw new Error('User not found')
 
         if (isUserService(user)) {
-            const logs = await getTransactionsForUser(req.params.id)
+            const logs = await getUserAccounts(req.params.id)
             return res.status(200).json({success: true, logs})
         } else {
             throw new Error('You are not a service')
@@ -80,7 +81,7 @@ serviceRouter.put("/updateUserAccount/:id", passport.authenticate("jwt", {sessio
     }
 })
 
-serviceRouter.get('/users',  async (req: Request, res: Response, next: NextFunction) => {
+serviceRouter.get('/users', passport.authenticate("jwt", {session: false}), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const authHeader: string | undefined = req.header('Authorization')
         const user = await getUserFromJwt(authHeader)
@@ -104,7 +105,7 @@ serviceRouter.get("/userAccount/:id", passport.authenticate("jwt", {session: fal
         if (!user) throw new Error('User not found')
 
         if (isUserService(user)) {
-            const account = await getAccountById(req.params.id)
+            const account = await getTransactionsForAccount(req.params.id)
             if (!account) throw new Error('Account not found')
 
             return res.status(200).json({success: true, account})
@@ -114,6 +115,25 @@ serviceRouter.get("/userAccount/:id", passport.authenticate("jwt", {session: fal
     } catch (e) {
         next(e)
     }
+})
+
+serviceRouter.get("/user/:id", passport.authenticate("jwt", {session: false}), async (req, res, next) => {
+  try {
+    const authHeader: string | undefined = req.header('Authorization')
+    const user = await getUserFromJwt(authHeader)
+    if (!user) throw new Error('User not found')
+
+    if (isUserService(user)) {
+      const user = await getUserById(req.params.id)
+      if (!user) throw new Error('User not found')
+
+      return res.status(200).json({success: true, user})
+    } else {
+      throw new Error('You are not a service')
+    }
+  } catch (e) {
+    next(e)
+  }
 })
 
 export default serviceRouter;
