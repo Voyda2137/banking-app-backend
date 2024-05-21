@@ -1,6 +1,6 @@
-import {BankAccount} from "./AccountInterface";
+import {bankAccountStatusTypes} from "../Constants/BankAccountStatusCodes";
 
 export type AccountUpdate = {
     accountId: string,
-    status: Pick<BankAccount,"status">
+    status: bankAccountStatusTypes
 }

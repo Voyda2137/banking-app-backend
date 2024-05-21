@@ -126,6 +126,17 @@ export const changeUserToService = async ({token, login}: { token: string, login
     }
     return 0
 }
+export const changeServiceToUser = async ({token, login}: { token: string, login: string }) => {
+    const serviceUser = await getUserFromJwt(token)
+    if (serviceUser?.isService) {
+        const futureService = await getUserByLogin(login)
+        if (futureService) {
+            await UserModel.updateOne({_id: futureService._id}, {isService: false})
+            return 1
+        }
+    }
+    return 0
+}
 export const changeSettings = async ({userId, locale, mainAccount}: {
     userId: string,
     locale?: languages,
@@ -342,3 +353,10 @@ export const getTransactionsForAccount = async (accountId: string) => {
     }
 }
 
+export const getUsers = async (currentUserId: string) => {
+    try {
+        return await UserModel.find({_id: {$ne: currentUserId}}).select('-password').exec()
+    } catch (e) {
+        return null
+    }
+}

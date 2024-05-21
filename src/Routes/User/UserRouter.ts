@@ -1,6 +1,13 @@
 import {Router, Request, Response, NextFunction} from "express";
 import {authenticateUser} from "../../Utils/UserUtils/Authenticator";
-import {changeSettings, changeUserToService, createUser, editUser} from "../../Utils/DatabaseUtils/DatabaseUtils";
+import {
+    changeServiceToUser,
+    changeSettings,
+    changeUserToService,
+    createUser,
+    editUser,
+    getUsers
+} from "../../Utils/DatabaseUtils/DatabaseUtils";
 import passport from "../../Utils/UserUtils/Authorizer";
 import {getUserFromJwt} from "../../Utils/UserUtils/GeneralUtils";
 import moment from "moment";
@@ -128,6 +135,25 @@ userRouter.put('/addService', changeUserToServiceValidator, passport.authenticat
         next(e)
     }
 })
+userRouter.put('/removeService', changeUserToServiceValidator, passport.authenticate('jwt', {session: false}), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({success: false, errors: errors.array()});
+        }
+        const authHeader: string | undefined = req.header('Authorization')
+        if (authHeader) {
+            const removedService = await changeServiceToUser({token: authHeader, login: req.body.login})
+            if (removedService) return res.status(200).json({
+                success: true,
+                message: 'Successfully removed service status from user'
+            })
+            else throw new Error('Cannot remove service status from user')
+        }
+    } catch (e) {
+        next(e)
+    }
+})
 userRouter.post('/refreshToken', passport.authenticate('jwt', { session: false }), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const authHeader: string | undefined = req.header('Authorization')
@@ -158,4 +184,5 @@ userRouter.put('/settings', changeSettingsValidator, passport.authenticate('jwt'
         next(e)
     }
 })
+
 export default userRouter

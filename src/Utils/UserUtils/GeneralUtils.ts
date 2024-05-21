@@ -1,6 +1,7 @@
 import jwt, {Secret} from "jsonwebtoken";
 import {CustomJwtPayload} from "../../models/JwtInterface";
 import {getUserByLogin} from "../DatabaseUtils/DatabaseUtils";
+import {User} from "../../models/UserInterface";
 
 export const extractJwtFromReq = (authHeader: string | undefined) => {
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -22,4 +23,8 @@ export const getUserFromJwt = async (authHeader: string | undefined) => {
         return getUserByLogin(login)
     }
     else return null
+}
+
+export const isUserService = (user: User) => {
+    return user.isService
 }

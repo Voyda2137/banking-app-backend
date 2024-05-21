@@ -7,6 +7,7 @@ import transactionRouter from "./Routes/Transaction/TransactionRouter";
 import messageRouter from "./Routes/Messages/MessageRouter";
 import currencyRouter from "./Routes/Currency/CurrencyRouter";
 import analysisRouter from "./Routes/Analysis/AnalysisRouter";
+import serviceRouter from "./Routes/Service/ServiceRouter";
 
 const app: Express = express()
 const port = process.env.PORT
@@ -44,6 +45,7 @@ app.use('/transactions', transactionRouter)
 app.use('/messages', messageRouter)
 app.use('/currency', currencyRouter)
 app.use('/analysis', analysisRouter);
+app.use('/service', serviceRouter);
 
 app.use(errorHandler)
 
